@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.sparrowjson.mapper.FrontendConfigMapper">
+    <resultMap id="BaseResultMap" type="com.sparrowjson.dto.FrontendConfigDTO">
+        <!--
+          WARNING - @mbg.generated
+        -->
+        <id column="tid" property="tid" jdbcType="INTEGER"/>
+        <result column="function_name" property="functionName" jdbcType="VARCHAR"/>
+        <result column="type" property="type" jdbcType="INTEGER"/>
+        <result column="value" property="value" jdbcType="LONGVARCHAR"/>
+    </resultMap>
+    <select id="listByFunctionName" resultMap="BaseResultMap">
+        select *
+        from t_frontend_config
+        where function_name = #{functionName}
+    </select>
+</mapper>
