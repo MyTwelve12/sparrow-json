@@ -1,5 +1,6 @@
 package com.sparrowjson.vo;
 
+import com.sparrowjson.vo.unit.FrontendItemConfigBO;
 import lombok.Data;
 
 import java.util.ArrayList;
@@ -28,6 +29,11 @@ public class MenuConfig {
     private List<DeleteConfig> deleteConfigs = new ArrayList<>();
     private List<QueryConfig> queryConfigs = new ArrayList<>();
 
+    /**
+     * 数据库字段映射
+     */
+    private Map<String, FrontendItemConfigBO> frontendItemConfigBOMap = new HashMap<>();
+
     private List<CreateTableConfig> createTables = new ArrayList<>();
 
     private List<InsertTableColumnsConfig> insertTableColumns = new ArrayList<>();
@@ -35,7 +41,6 @@ public class MenuConfig {
     private List<ColumnVO> coulumns;
 
     private Map<String, String> columnCommentMap = new HashMap<>();
-
 
 
     public void setCoulumns(List<ColumnVO> coulumns) {

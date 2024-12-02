@@ -9,10 +9,12 @@
         <result column="function_name" property="functionName" jdbcType="VARCHAR"/>
         <result column="type" property="type" jdbcType="INTEGER"/>
         <result column="value" property="value" jdbcType="LONGVARCHAR"/>
+        <result column="version" property="version" jdbcType="INTEGER"/>
+        <result column="del_flag" property="delFlag" jdbcType="INTEGER"/>
     </resultMap>
     <select id="listByFunctionName" resultMap="BaseResultMap">
         select *
         from t_frontend_config
-        where function_name = #{functionName}
+        where function_name = #{functionName} and del_flag = 1
     </select>
 </mapper>

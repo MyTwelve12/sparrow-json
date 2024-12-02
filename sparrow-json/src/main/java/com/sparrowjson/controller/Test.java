@@ -16,9 +16,11 @@ import com.sparrowjson.vo.MenuConfig;
 import com.sparrowjson.vo.QueryConfig;
 import com.sparrowjson.vo.SparrowVO;
 import com.sparrowjson.vo.UpdateConfig;
+import com.sparrowjson.vo.unit.FrontendItemConfigBO;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Description:
@@ -234,10 +236,21 @@ public class Test {
 
     private void insertBackendList(MenuConfig menuConfig, List<BackendVO> backendList) {
         List<InsertConfig> insertConfigs = menuConfig.getInsertConfigs();
+        //获取数据库中的配置数据
+        Map<String, FrontendItemConfigBO> frontendItemConfigBOMap = menuConfig.getFrontendItemConfigBOMap();
         for (InsertConfig insertConfig : insertConfigs) {
             //2.构建，templateAlias，endpoint
             BackendVO backendVO = new BackendVO();
+            //插入的别名不为空
+//            if (frontendItemConfigBOMap.get(insertConfig.getName()) != null) {
+//                backendVO.setTemplateAlias(frontendItemConfigBOMap.get(insertConfig.getName()).getShowField());
+//            }else{
+//                //
+//                backendVO.setTemplateAlias(insertConfig.getTemplateAlias() + ChineseToPinyinUtil.toPinyin(insertConfig.getName()));
+//            }
+
             backendVO.setTemplateAlias(insertConfig.getTemplateAlias() + ChineseToPinyinUtil.toPinyin(insertConfig.getName()));
+
             BackendEndpointVO endpointVO = new BackendEndpointVO();
             endpointVO.setType(1);
             endpointVO.setMethod("POST");

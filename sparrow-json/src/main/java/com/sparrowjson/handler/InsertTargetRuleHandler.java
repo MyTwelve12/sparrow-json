@@ -9,6 +9,7 @@ import com.sparrowjson.vo.BackendVariablesVO;
 import com.sparrowjson.vo.ColumnVO;
 import com.sparrowjson.vo.InsertConfig;
 import com.sparrowjson.vo.MenuConfig;
+import com.sparrowjson.vo.unit.FrontendItemConfigBO;
 import lombok.Data;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
@@ -48,6 +49,10 @@ public class InsertTargetRuleHandler implements VariableHandler {
             List<ColumnVO> coulumns = DatabaseMetaDataUtil.getCoulumns(tableName);
             columnCommentMap = coulumns.stream().collect(Collectors.toMap(ColumnVO::getComment, ColumnVO::getColumnName, (v1, v2) -> v1));
         }
+
+        //前端配置map
+        Map<String, FrontendItemConfigBO> frontendItemConfigBOMap = menuConfig.getFrontendItemConfigBOMap();
+
 
         if (!StringUtils.isBlank(insertConfig.getBatchInsertFields())) {
             targetTableRuleDTO.setBatchInsertType(2);

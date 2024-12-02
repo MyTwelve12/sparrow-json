@@ -32,4 +32,14 @@ public class FrontendConfigDTO {
     @Column(name = "value")
     private String value;
 
+    /**
+     *
+     */
+    @Column(name = "version")
+    private Integer version;
+
+    @Column(name = "del_flag")
+    private Integer delFlag;
+
+
 }

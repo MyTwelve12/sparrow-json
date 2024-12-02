@@ -14,9 +14,11 @@ import com.sparrowjson.vo.MenuConfig;
 import com.sparrowjson.vo.UpdateConfig;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.sparrowjson.vo.unit.FrontendItemConfigBO;
 import lombok.Data;
 import org.springframework.stereotype.Component;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -60,6 +62,9 @@ public class UpdateConditionHandler implements VariableHandler {
             List<ColumnVO> coulumns = DatabaseMetaDataUtil.getCoulumns(tableName);
             columnCommentMap = coulumns.stream().collect(Collectors.toMap(ColumnVO::getComment, ColumnVO::getColumnName, (v1, v2) -> v1));
         }
+
+        //前端配置模版
+        Map<String, FrontendItemConfigBO> frontendItemConfigBOMap = new HashMap<>();
 
         String[] insertFields = insertFieldStr.split(SparrowBackendConstant.COMMA_SEPARATOR);
 

@@ -14,6 +14,7 @@ import com.sparrowjson.vo.ColumnVO;
 import com.sparrowjson.vo.MenuConfig;
 import com.sparrowjson.vo.QueryConfig;
 import com.google.common.collect.Lists;
+import com.sparrowjson.vo.unit.FrontendItemConfigBO;
 import lombok.Data;
 import org.springframework.stereotype.Component;
 
@@ -58,6 +59,9 @@ public class QueryParamHandler implements VariableHandler {
             List<ColumnVO> coulumns = DatabaseMetaDataUtil.getCoulumns(queryConfig.getTable());
             columnCommentMap = coulumns.stream().collect(Collectors.toMap(ColumnVO::getComment, ColumnVO::getColumnName, (v1, v2) -> v1));
         }
+
+        //前端配置模版
+        Map<String, FrontendItemConfigBO> frontendItemConfigBOMap = new HashMap<>();
 
         String[] conditionsArray = conditions.split(SparrowBackendConstant.COMMA_SEPARATOR);
 

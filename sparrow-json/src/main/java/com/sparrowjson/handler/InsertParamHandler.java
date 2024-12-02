@@ -12,6 +12,7 @@ import com.sparrowjson.vo.BackendVariablesVO;
 import com.sparrowjson.vo.ColumnVO;
 import com.sparrowjson.vo.InsertConfig;
 import com.sparrowjson.vo.MenuConfig;
+import com.sparrowjson.vo.unit.FrontendItemConfigBO;
 import lombok.Data;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
@@ -54,6 +55,9 @@ public class InsertParamHandler implements VariableHandler {
             List<ColumnVO> coulumns = DatabaseMetaDataUtil.getCoulumns(tableName);
             columnCommentMap = coulumns.stream().collect(Collectors.toMap(ColumnVO::getComment, ColumnVO::getColumnName, (v1, v2) -> v1));
         }
+        //前端配置数据
+        Map<String, FrontendItemConfigBO> frontendItemConfigBOMap = menuConfig.getFrontendItemConfigBOMap();
+
 
         List<TableInsertDTO> tableInsertDTOS = Lists.newArrayList();
         Map<String, Integer> tableFieldIndex = Maps.newHashMap();
@@ -84,7 +88,13 @@ public class InsertParamHandler implements VariableHandler {
 
     @Data
     public static class TableInsertDTO {
+        /**
+         * 表字段
+         */
         private String tableField;
+        /**
+         * 插入字段（驼峰命名）
+         */
         private String insertField;
     }
 

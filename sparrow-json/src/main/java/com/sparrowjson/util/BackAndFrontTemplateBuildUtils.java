@@ -6,6 +6,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sparrowjson.vo.MenuConfig;
+import com.sparrowjson.vo.unit.FrontendItemConfigBO;
 
 import java.io.*;
 import java.util.HashMap;
@@ -103,6 +104,44 @@ public class BackAndFrontTemplateBuildUtils {
         return map;
 
     }
+
+
+
+    /**
+     * 将当前的对象转成map
+     */
+    public static Map<String, FrontendItemConfigBO> changeObjectToMap(List<String> list) {
+        Map<String, FrontendItemConfigBO> map = new HashMap<>();
+
+        for (String str : list) {
+            ObjectMapper objectMapper = new ObjectMapper();
+            JsonNode rootNode = null;
+            try {
+                rootNode = objectMapper.readTree(str);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            // 判断是对象还是数组
+            if (rootNode.isArray()) {
+                //数组
+                List<FrontendItemConfigBO> frontendItemConfigBOS = JSONArray.parseArray(str, FrontendItemConfigBO.class);
+                for (FrontendItemConfigBO item : frontendItemConfigBOS) {
+                    map.put(item.getName(), item);
+                }
+
+            } else if (rootNode.isObject()) {
+                //对象
+                FrontendItemConfigBO frontendItemConfigBO = JSON.parseObject(str, FrontendItemConfigBO.class);
+                map.put(frontendItemConfigBO.getName(), frontendItemConfigBO);
+
+            }
+        }
+
+        return map;
+
+    }
+
 
     /**
      * @param targetJsonArrayStr 目标json

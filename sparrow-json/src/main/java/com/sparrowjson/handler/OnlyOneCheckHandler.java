@@ -10,11 +10,13 @@ import com.sparrowjson.vo.BackConfig;
 import com.sparrowjson.vo.BackendVariablesVO;
 import com.sparrowjson.vo.MenuConfig;
 import com.google.common.collect.Lists;
+import com.sparrowjson.vo.unit.FrontendItemConfigBO;
 import lombok.Data;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -38,6 +40,10 @@ public class OnlyOneCheckHandler implements VariableHandler {
             return null;
         }
         Map<String, String> columnCommentMap = menuConfig.getColumnCommentMap();
+
+        //前端配置模版
+        Map<String, FrontendItemConfigBO> frontendItemConfigBOMap = new HashMap<>();
+
 
         List<OnlyOneCheckDTO> oneCheckDTOS = Lists.newArrayList();
 

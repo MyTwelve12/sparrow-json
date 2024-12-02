@@ -13,7 +13,9 @@ package com.sparrowjson.controller;
 import com.alibaba.fastjson.JSON;
 import com.sparrowjson.component.FrontendComponent;
 import com.sparrowjson.database.DatabaseMetaDataUtil;
+import com.sparrowjson.dto.FrontendConfigDTO;
 import com.sparrowjson.dto.SparrowBackendConfigDTO;
+import com.sparrowjson.mapper.FrontendConfigMapper;
 import com.sparrowjson.mapper.SparrowBackendConfigMapper;
 import com.sparrowjson.util.BackAndFrontTemplateBuildUtils;
 import com.sparrowjson.util.ConfigFileReader;
@@ -22,7 +24,9 @@ import com.sparrowjson.vo.FrontendVO;
 import com.sparrowjson.vo.MenuConfig;
 import com.sparrowjson.vo.SparrowVO;
 import com.sparrowjson.vo.unit.FileDataUnitBO;
+import com.sparrowjson.vo.unit.FrontendItemConfigBO;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -31,8 +35,11 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.*;
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/test1Json")
@@ -44,6 +51,9 @@ public class TestJson1Controller {
     @Autowired
     private FrontendComponent frontendComponent;
 
+
+    @Autowired
+    private FrontendConfigMapper frontendConfigMapper;
 
     @PostMapping("/v1FilePath")
     public String v1FilePath(@RequestBody Map<String, Object> data) {
@@ -118,7 +128,7 @@ public class TestJson1Controller {
          */
         MenuConfig config = templateBuildUtils.buildBackendConfig(fileDataUnitBO.getBackList());
 
-
+        //处理前端
         FrontendVO frontendVO = frontendComponent.buildFrontTemplateInfo(fileDataUnitBO.getFrontList(), "1");
 
         Test test = new Test();
@@ -129,6 +139,17 @@ public class TestJson1Controller {
 
         List<ColumnVO> coulumns = DatabaseMetaDataUtil.getCoulumns(config.getTable());
         config.setCoulumns(coulumns);
+
+        //查询当前的后端的配置数据
+        List<FrontendConfigDTO> frontendConfigDTOS = frontendConfigMapper.listByFunctionName("资源管理");
+        Map<String, FrontendItemConfigBO> itemConfigBOMap = new HashMap<>();
+        if (!CollectionUtils.isEmpty(frontendConfigDTOS)) {
+            List<String> valueList =
+                    frontendConfigDTOS.stream().filter(item -> Arrays.asList(3, 4).contains(item.getType())).map(item -> item.getValue()).collect(Collectors.toList());
+            itemConfigBOMap = BackAndFrontTemplateBuildUtils.changeObjectToMap(valueList);
+        }
+
+        config.setFrontendItemConfigBOMap(itemConfigBOMap);
         SparrowVO sparrowVO = test.buildSparrowBackJSON(config);
         sparrowVO.setFrontend(frontendVO);
         return JSON.toJSONString(sparrowVO);

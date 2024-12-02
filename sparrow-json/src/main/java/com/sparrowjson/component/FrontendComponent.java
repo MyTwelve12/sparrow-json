@@ -13,6 +13,7 @@ import com.sparrowjson.util.FrontParamsBuilder;
 import com.sparrowjson.vo.FrontendPageConfigVO;
 import com.sparrowjson.vo.FrontendVO;
 import com.sparrowjson.vo.FrontendVariablesVO;
+import com.sparrowjson.vo.unit.FrontendItemConfigBO;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -90,11 +91,11 @@ public class FrontendComponent {
             }
 
             //todo 常量枚举的替换，例如用户实际填的是中文描述，我们现在需要将中文的描述转成相关的英文的描述
-            List<FrontendConfigDTO> commonConfigList = frontendConfigDTOS.stream().filter(item -> Arrays.asList(2, 3, 7).contains(item.getType())).collect(Collectors.toList());
-            Map<String, String> commonConstantMap = new HashMap<>();
+            List<FrontendConfigDTO> commonConfigList = frontendConfigDTOS.stream().filter(item -> Arrays.asList(2, 3, 4, 7).contains(item.getType())).collect(Collectors.toList());
+            Map<String, FrontendItemConfigBO> commonConstantMap = new HashMap<>();
             if (!CollectionUtils.isEmpty(commonConfigList)) {
                 List<String> valueList = commonConfigList.stream().map(item -> item.getValue()).collect(Collectors.toList());
-                commonConstantMap = BackAndFrontTemplateBuildUtils.changeToMap(valueList);
+                commonConstantMap = BackAndFrontTemplateBuildUtils.changeObjectToMap(valueList);
             }
 
             //todo 默认前端组件模版比如输入组件input-text button ...
@@ -156,6 +157,8 @@ public class FrontendComponent {
 
             String jsonStr = frontParamsBuilder.parseText();
 
+            System.out.println("前端数据转化后的json: " + jsonStr);
+
             List<FrontendVariablesVO> list = frontTemplateExecute.combineFixedTemplate(jsonStr, defaultJSONFrontTemplate, fixedValueJSONArray, changedValueJSONObject);
 
 
@@ -173,6 +176,11 @@ public class FrontendComponent {
         }
 
         return null;
+    }
+
+
+    public void buildBackTemplateInfo(){
+
     }
 
 

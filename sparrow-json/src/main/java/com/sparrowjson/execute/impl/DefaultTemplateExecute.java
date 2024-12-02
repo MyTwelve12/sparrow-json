@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 @Component
 public class DefaultTemplateExecute implements FrontTemplateExecute {
@@ -70,7 +71,13 @@ public class DefaultTemplateExecute implements FrontTemplateExecute {
             Object jsonObject = changedValueJSONObject.get(str);
             FrontendVariablesVO frontendVariablesVO = JSON.parseObject(JSON.toJSONString(jsonObject), FrontendVariablesVO.class);
             if (resultMap.get(str) != null) {
-                frontendVariablesVO.setValue(JSON.toJSONString(resultMap.get(str)));
+                if (Objects.equals(str, "columns") || Objects.equals(str, "filter")) {
+                    JSONObject jsonObject1 = (JSONObject) resultMap.get(str).get(0);
+                    frontendVariablesVO.setValue(JSON.toJSONString(jsonObject1.get("value")));
+                }else{
+                    frontendVariablesVO.setValue(JSON.toJSONString(resultMap.get(str)));
+                }
+
             }
             frontVariableBOS.add(frontendVariablesVO);
         }
