@@ -50,11 +50,11 @@ public class InsertParamHandler implements VariableHandler {
 
         String[] insertFields = insertFieldStr.split(SparrowBackendConstant.COMMA_SEPARATOR);
 
-        Map<String, String> columnCommentMap = menuConfig.getColumnCommentMap();
-        if (tableName != null && !Objects.equals(tableName, menuConfig.getTable())) {
-            List<ColumnVO> coulumns = DatabaseMetaDataUtil.getCoulumns(tableName);
-            columnCommentMap = coulumns.stream().collect(Collectors.toMap(ColumnVO::getComment, ColumnVO::getColumnName, (v1, v2) -> v1));
-        }
+//        Map<String, String> columnCommentMap = menuConfig.getColumnCommentMap();
+//        if (tableName != null && !Objects.equals(tableName, menuConfig.getTable())) {
+//            List<ColumnVO> coulumns = DatabaseMetaDataUtil.getCoulumns(tableName);
+//            columnCommentMap = coulumns.stream().collect(Collectors.toMap(ColumnVO::getComment, ColumnVO::getColumnName, (v1, v2) -> v1));
+//        }
         //前端配置数据
         Map<String, FrontendItemConfigBO> frontendItemConfigBOMap = menuConfig.getFrontendItemConfigBOMap();
 
@@ -63,7 +63,15 @@ public class InsertParamHandler implements VariableHandler {
         Map<String, Integer> tableFieldIndex = Maps.newHashMap();
         for (String tableField : insertFields) {
             TableInsertDTO tableInsertDTO = new TableInsertDTO();
-            String realTableField = columnCommentMap.get(tableField);
+            //String realTableField = columnCommentMap.get(tableField);
+            //
+            FrontendItemConfigBO frontendItemConfigBO = frontendItemConfigBOMap.get(tableField);
+
+            if (frontendItemConfigBO == null) {
+                throw new IllegalArgumentException("字段:" + tableField + "没有对应的数据库字段");
+            }
+            String realTableField = frontendItemConfigBO.getValue();
+
             if (StringUtils.isBlank(realTableField)) {
                 throw new IllegalArgumentException("字段:" + tableField + "没有对应的数据库字段");
             }
@@ -76,8 +84,9 @@ public class InsertParamHandler implements VariableHandler {
             } else {
                 tableFieldIndex.put(realTableField, 0);
             }
-            tableInsertDTO.setInsertField(SnakeToCamelUtil.toCamelCase(realTableField) + insertFieldSuffix);
-
+            String showField = frontendItemConfigBO.getShowField();
+            //tableInsertDTO.setInsertField(SnakeToCamelUtil.toCamelCase(realTableField) + insertFieldSuffix);
+            tableInsertDTO.setInsertField(showField + insertFieldSuffix);
             tableInsertDTOS.add(tableInsertDTO);
         }
         config = config.replace("${insertParam}", JSON.toJSONString(tableInsertDTOS));

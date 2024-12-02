@@ -43,12 +43,12 @@ public class InsertTargetRuleHandler implements VariableHandler {
         InsertConfig insertConfig = (InsertConfig) backConfig;
 
         String tableName = insertConfig.getTableName();
-        Map<String, String> columnCommentMap = menuConfig.getColumnCommentMap();
-        if (tableName != null && !Objects.equals(tableName, menuConfig.getTable())) {
-            targetTableRuleDTO.setTableName(tableName);
-            List<ColumnVO> coulumns = DatabaseMetaDataUtil.getCoulumns(tableName);
-            columnCommentMap = coulumns.stream().collect(Collectors.toMap(ColumnVO::getComment, ColumnVO::getColumnName, (v1, v2) -> v1));
-        }
+//        Map<String, String> columnCommentMap = menuConfig.getColumnCommentMap();
+//        if (tableName != null && !Objects.equals(tableName, menuConfig.getTable())) {
+//            targetTableRuleDTO.setTableName(tableName);
+//            List<ColumnVO> coulumns = DatabaseMetaDataUtil.getCoulumns(tableName);
+//            columnCommentMap = coulumns.stream().collect(Collectors.toMap(ColumnVO::getComment, ColumnVO::getColumnName, (v1, v2) -> v1));
+//        }
 
         //前端配置map
         Map<String, FrontendItemConfigBO> frontendItemConfigBOMap = menuConfig.getFrontendItemConfigBOMap();
@@ -59,7 +59,9 @@ public class InsertTargetRuleHandler implements VariableHandler {
             String[] batchInsertFields = insertConfig.getBatchInsertFields().split(SparrowBackendConstant.COMMA_SEPARATOR);
 
             for (int i = 0; i < batchInsertFields.length; i++) {
-                String realTableField = columnCommentMap.get(batchInsertFields[i]);
+//                String realTableField = columnCommentMap.get(batchInsertFields[i]);
+                String realTableField = frontendItemConfigBOMap.get(batchInsertFields[i]).getValue();
+
                 batchInsertFields[i] = realTableField;
             }
 

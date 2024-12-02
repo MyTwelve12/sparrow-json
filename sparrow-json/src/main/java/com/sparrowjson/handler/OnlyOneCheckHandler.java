@@ -39,7 +39,7 @@ public class OnlyOneCheckHandler implements VariableHandler {
         if (CollectionUtils.isEmpty(onlyOneCheck)) {
             return null;
         }
-        Map<String, String> columnCommentMap = menuConfig.getColumnCommentMap();
+//        Map<String, String> columnCommentMap = menuConfig.getColumnCommentMap();
 
         //前端配置模版
         Map<String, FrontendItemConfigBO> frontendItemConfigBOMap = new HashMap<>();
@@ -74,19 +74,35 @@ public class OnlyOneCheckHandler implements VariableHandler {
                 }
                 JSONObject jsonObject = new JSONObject();
 
-                String realTableField = columnCommentMap.get(singleField[0]);
-                if (StringUtils.isBlank(realTableField)) {
+                //String realTableField = columnCommentMap.get(singleField[0]);
+                FrontendItemConfigBO frontendItemConfigBO = frontendItemConfigBOMap.get(singleField[0]);
+                if (frontendItemConfigBO == null) {
                     throw new IllegalArgumentException("字段:" + singleField[0] + "没有对应的数据库字段");
                 }
+                //实际展示字段
+                String realTableField = frontendItemConfigBO.getShowField();
+
+//                if (StringUtils.isBlank(realTableField)) {
+//                    throw new IllegalArgumentException("字段:" + singleField[0] + "没有对应的数据库字段");
+//                }
+                //正确的表字段
                 String rightTableField = realTableField;
+                FrontendItemConfigBO rightsFrontItemConfigBO = frontendItemConfigBO;
                 String linker = singleField[1];
                 if (singleField.length == 3) {
-                    String rightTableFieldColumn = columnCommentMap.get(singleField[1]);
-                    if (StringUtils.isBlank(rightTableFieldColumn)) {
-                        rightTableField = singleField[1];
-                    } else {
-                        rightTableField = rightTableFieldColumn;
+                    //String rightTableFieldColumn = columnCommentMap.get(singleField[1]);
+                    FrontendItemConfigBO itemConfigBO = frontendItemConfigBOMap.get(singleField[1]);
+
+                    if (itemConfigBO != null) {
+                        rightTableField = itemConfigBO.getShowField();
+                    }else{
+                        rightTableField = realTableField;
                     }
+//                    if (StringUtils.isBlank(rightTableFieldColumn)) {
+//                        rightTableField = singleField[1];
+//                    } else {
+//                        rightTableField = rightTableFieldColumn;
+//                    }
                     linker = singleField[2];
                 }
 

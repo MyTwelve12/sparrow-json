@@ -242,14 +242,13 @@ public class Test {
             //2.构建，templateAlias，endpoint
             BackendVO backendVO = new BackendVO();
             //插入的别名不为空
-//            if (frontendItemConfigBOMap.get(insertConfig.getName()) != null) {
-//                backendVO.setTemplateAlias(frontendItemConfigBOMap.get(insertConfig.getName()).getShowField());
-//            }else{
-//                //
-//                backendVO.setTemplateAlias(insertConfig.getTemplateAlias() + ChineseToPinyinUtil.toPinyin(insertConfig.getName()));
-//            }
+            if (frontendItemConfigBOMap.get(insertConfig.getName()) != null) {
+                backendVO.setTemplateAlias(frontendItemConfigBOMap.get(insertConfig.getName()).getShowField());
+            }else{
+                //
+                backendVO.setTemplateAlias(insertConfig.getTemplateAlias() + ChineseToPinyinUtil.toPinyin(insertConfig.getName()));
+            }
 
-            backendVO.setTemplateAlias(insertConfig.getTemplateAlias() + ChineseToPinyinUtil.toPinyin(insertConfig.getName()));
 
             BackendEndpointVO endpointVO = new BackendEndpointVO();
             endpointVO.setType(1);
