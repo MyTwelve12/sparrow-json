@@ -54,11 +54,11 @@ public class QueryParamHandler implements VariableHandler {
             return backendVariablesVO;
         }
 
-        Map<String, String> columnCommentMap = menuConfig.getColumnCommentMap();
-        if (queryConfig.getTable() != null && !Objects.equals(queryConfig.getTable(), menuConfig.getTable())) {
-            List<ColumnVO> coulumns = DatabaseMetaDataUtil.getCoulumns(queryConfig.getTable());
-            columnCommentMap = coulumns.stream().collect(Collectors.toMap(ColumnVO::getComment, ColumnVO::getColumnName, (v1, v2) -> v1));
-        }
+//        Map<String, String> columnCommentMap = menuConfig.getColumnCommentMap();
+//        if (queryConfig.getTable() != null && !Objects.equals(queryConfig.getTable(), menuConfig.getTable())) {
+//            List<ColumnVO> coulumns = DatabaseMetaDataUtil.getCoulumns(queryConfig.getTable());
+//            columnCommentMap = coulumns.stream().collect(Collectors.toMap(ColumnVO::getComment, ColumnVO::getColumnName, (v1, v2) -> v1));
+//        }
 
         //前端配置模版
         Map<String, FrontendItemConfigBO> frontendItemConfigBOMap = new HashMap<>();
@@ -73,25 +73,42 @@ public class QueryParamHandler implements VariableHandler {
             }
             String tableField = queryFields[0];
 
-            String realTableField = columnCommentMap.get(tableField);
-            if (StringUtil.isBlank(realTableField)) {
+//            String realTableField = columnCommentMap.get(tableField);
+
+
+//            if (StringUtil.isBlank(realTableField)) {
+//                throw new IllegalArgumentException("字段:" + tableField + "没有对应的数据库字段");
+//            }
+
+            FrontendItemConfigBO frontendItemConfigBO = frontendItemConfigBOMap.get(tableField);
+            if (frontendItemConfigBO == null) {
                 throw new IllegalArgumentException("字段:" + tableField + "没有对应的数据库字段");
             }
-            String rightTableField = realTableField;
+            //表中的实际字段
+            String realTableField = frontendItemConfigBO.getValue();
+            //需要转化的字段，默认是表字段的驼峰格式
+            String rightTableField = frontendItemConfigBO.getShowField();
             String linker = queryFields[1];
             if (queryFields.length == 3) {
-                String rightTableFieldColumn = columnCommentMap.get(queryFields[1]);
-                if (StringUtil.isBlank(rightTableFieldColumn)) {
+                //如果长度是3的话，则第三列作为字段
+//                String rightTableFieldColumn = columnCommentMap.get(queryFields[1]);
+                FrontendItemConfigBO frontendItemConfigBO1 = frontendItemConfigBOMap.get(queryFields[1]);
+                if (frontendItemConfigBO1 == null) {
                     rightTableField = queryFields[1];
                 } else {
-                    rightTableField = rightTableFieldColumn;
+                    rightTableField = frontendItemConfigBO1.getShowField();
                 }
+//                if (StringUtil.isBlank(rightTableFieldColumn)) {
+//                    rightTableField = queryFields[1];
+//                } else {
+//                    rightTableField = rightTableFieldColumn;
+//                }
                 linker = queryFields[2];
             }
 
             TableQueryDTO tableQueryDTO = new TableQueryDTO();
             tableQueryDTO.setTableField(realTableField);
-            tableQueryDTO.setQueryField(SnakeToCamelUtil.toCamelCase(rightTableField));
+            tableQueryDTO.setQueryField(rightTableField);
             tableQueryDTO.setLinker(linker);
             tableQueryDTOS.add(tableQueryDTO);
         }

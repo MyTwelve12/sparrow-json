@@ -95,7 +95,7 @@ public class OnlyOneCheckHandler implements VariableHandler {
 
                     if (itemConfigBO != null) {
                         rightTableField = itemConfigBO.getShowField();
-                    }else{
+                    } else {
                         rightTableField = realTableField;
                     }
 //                    if (StringUtils.isBlank(rightTableFieldColumn)) {
@@ -109,10 +109,12 @@ public class OnlyOneCheckHandler implements VariableHandler {
 
                 jsonObject.put("tableField", realTableField);
                 if (Objects.equals(sparrowBackendConfigDTO.getTemplateAlias(), TemplateAliasEnum.add.name())) {
-                    jsonObject.put("insertField", SnakeToCamelUtil.toCamelCase(rightTableField));
+//                    jsonObject.put("insertField", SnakeToCamelUtil.toCamelCase(rightTableField));
+                    jsonObject.put("insertField", realTableField);
                 } else if (Objects.equals(sparrowBackendConfigDTO.getTemplateAlias(), TemplateAliasEnum.update.name())
                         || Objects.equals(sparrowBackendConfigDTO.getTemplateAlias(), TemplateAliasEnum.delete.name())) {
                     jsonObject.put("updateField", SnakeToCamelUtil.toCamelCase(rightTableField));
+                    jsonObject.put("updateField", realTableField);
                 }
                 jsonObject.put("linker", linker);
                 arrayList.add(jsonObject);
