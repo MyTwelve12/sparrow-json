@@ -58,11 +58,11 @@ public class QueryTargetRuleHandler implements VariableHandler {
         if (!StringUtil.isBlank(queryConfig.getTable())) {
             tableRuleDTO.setTableName(queryConfig.getTable());
         }
-        Map<String, String> columnCommentMap = menuConfig.getColumnCommentMap();
-        if (queryConfig.getTable() != null && !Objects.equals(queryConfig.getTable(), menuConfig.getTable())) {
-            List<ColumnVO> coulumns = DatabaseMetaDataUtil.getCoulumns(queryConfig.getTable());
-            columnCommentMap = coulumns.stream().collect(Collectors.toMap(ColumnVO::getComment, ColumnVO::getColumnName, (v1, v2) -> v1));
-        }
+//        Map<String, String> columnCommentMap = menuConfig.getColumnCommentMap();
+//        if (queryConfig.getTable() != null && !Objects.equals(queryConfig.getTable(), menuConfig.getTable())) {
+//            List<ColumnVO> coulumns = DatabaseMetaDataUtil.getCoulumns(queryConfig.getTable());
+//            columnCommentMap = coulumns.stream().collect(Collectors.toMap(ColumnVO::getComment, ColumnVO::getColumnName, (v1, v2) -> v1));
+//        }
 
         //前端配置模版
         Map<String, FrontendItemConfigBO> frontendItemConfigBOMap = new HashMap<>();
@@ -71,12 +71,21 @@ public class QueryTargetRuleHandler implements VariableHandler {
         String[] fields = queryConfig.getQueryFields().split(SparrowBackendConstant.COMMA_SEPARATOR);
         for (int i = 0; i < fields.length; i++) {
 
-            String realTableField = columnCommentMap.get(fields[i]);
-            if (StringUtil.isBlank(realTableField)) {
+//            String realTableField = columnCommentMap.get(fields[i]);
+//
+//
+//            if (StringUtil.isBlank(realTableField)) {
+//                throw new IllegalArgumentException("字段:" + fields[i] + "没有对应的数据库字段");
+//            }
+
+            FrontendItemConfigBO frontendItemConfigBO = frontendItemConfigBOMap.get(fields[i]);
+
+            if (frontendItemConfigBO == null) {
                 throw new IllegalArgumentException("字段:" + fields[i] + "没有对应的数据库字段");
             }
+            fields[i] = frontendItemConfigBO.getShowField();
 
-            fields[i] = convertField(realTableField);
+            //fields[i] = convertField(realTableField);
         }
         tableRuleDTO.setTableField(String.join(",", fields));
         Integer outputType = 2;
@@ -93,10 +102,16 @@ public class QueryTargetRuleHandler implements VariableHandler {
             if (sortFields.length != 2) {
                 throw new IllegalArgumentException("排序字段格式不正确");
             }
-            String realTableField = columnCommentMap.get(sortFields[0]);
-            if (StringUtil.isBlank(realTableField)) {
+//            String realTableField = columnCommentMap.get(sortFields[0]);
+//            if (StringUtil.isBlank(realTableField)) {
+//                throw new IllegalArgumentException("字段:" + sortFields[0] + "没有对应的数据库字段");
+//            }
+
+            FrontendItemConfigBO frontendItemConfigBO = frontendItemConfigBOMap.get(sortFields[0]);
+            if (frontendItemConfigBO == null) {
                 throw new IllegalArgumentException("字段:" + sortFields[0] + "没有对应的数据库字段");
             }
+            String realTableField = frontendItemConfigBO.getShowField();
 
             String description = OrderTypeEnum.getDescription(sortFields[1]);
             tableRuleDTO.setTableSort(String.format("order by %s %s", realTableField, description));
