@@ -61,7 +61,7 @@ public class QueryParamHandler implements VariableHandler {
 //        }
 
         //前端配置模版
-        Map<String, FrontendItemConfigBO> frontendItemConfigBOMap = new HashMap<>();
+        Map<String, FrontendItemConfigBO> frontendItemConfigBOMap = menuConfig.getFrontendItemConfigBOMap();
 
         String[] conditionsArray = conditions.split(SparrowBackendConstant.COMMA_SEPARATOR);
 

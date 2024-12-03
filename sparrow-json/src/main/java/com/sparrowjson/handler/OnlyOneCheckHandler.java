@@ -42,7 +42,7 @@ public class OnlyOneCheckHandler implements VariableHandler {
 //        Map<String, String> columnCommentMap = menuConfig.getColumnCommentMap();
 
         //前端配置模版
-        Map<String, FrontendItemConfigBO> frontendItemConfigBOMap = new HashMap<>();
+        Map<String, FrontendItemConfigBO> frontendItemConfigBOMap = menuConfig.getFrontendItemConfigBOMap();
 
 
         List<OnlyOneCheckDTO> oneCheckDTOS = Lists.newArrayList();
@@ -80,13 +80,13 @@ public class OnlyOneCheckHandler implements VariableHandler {
                     throw new IllegalArgumentException("字段:" + singleField[0] + "没有对应的数据库字段");
                 }
                 //实际展示字段
-                String realTableField = frontendItemConfigBO.getShowField();
+                String realTableField = frontendItemConfigBO.getValue();
 
 //                if (StringUtils.isBlank(realTableField)) {
 //                    throw new IllegalArgumentException("字段:" + singleField[0] + "没有对应的数据库字段");
 //                }
                 //正确的表字段
-                String rightTableField = realTableField;
+                String rightTableField = frontendItemConfigBO.getTargetField();
                 FrontendItemConfigBO rightsFrontItemConfigBO = frontendItemConfigBO;
                 String linker = singleField[1];
                 if (singleField.length == 3) {
@@ -94,7 +94,7 @@ public class OnlyOneCheckHandler implements VariableHandler {
                     FrontendItemConfigBO itemConfigBO = frontendItemConfigBOMap.get(singleField[1]);
 
                     if (itemConfigBO != null) {
-                        rightTableField = itemConfigBO.getShowField();
+                        rightTableField = itemConfigBO.getTargetField();
                     } else {
                         rightTableField = realTableField;
                     }
@@ -110,11 +110,11 @@ public class OnlyOneCheckHandler implements VariableHandler {
                 jsonObject.put("tableField", realTableField);
                 if (Objects.equals(sparrowBackendConfigDTO.getTemplateAlias(), TemplateAliasEnum.add.name())) {
 //                    jsonObject.put("insertField", SnakeToCamelUtil.toCamelCase(rightTableField));
-                    jsonObject.put("insertField", realTableField);
+                    jsonObject.put("insertField", rightTableField);
                 } else if (Objects.equals(sparrowBackendConfigDTO.getTemplateAlias(), TemplateAliasEnum.update.name())
                         || Objects.equals(sparrowBackendConfigDTO.getTemplateAlias(), TemplateAliasEnum.delete.name())) {
-                    jsonObject.put("updateField", SnakeToCamelUtil.toCamelCase(rightTableField));
-                    jsonObject.put("updateField", realTableField);
+                    jsonObject.put("updateField", rightTableField);
+//                    jsonObject.put("updateField", realTableField);
                 }
                 jsonObject.put("linker", linker);
                 arrayList.add(jsonObject);

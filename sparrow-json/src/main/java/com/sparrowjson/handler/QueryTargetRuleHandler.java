@@ -46,6 +46,9 @@ public class QueryTargetRuleHandler implements VariableHandler {
             return null;
         }
 
+        //前端配置模版
+        Map<String, FrontendItemConfigBO> frontendItemConfigBOMap = menuConfig.getFrontendItemConfigBOMap();
+
         TableRuleDTO tableRuleDTO = new TableRuleDTO();
         tableRuleDTO.setTableDataSource(menuConfig.getDatabase());
         tableRuleDTO.setTableName(menuConfig.getTable());
@@ -60,12 +63,9 @@ public class QueryTargetRuleHandler implements VariableHandler {
         }
 //        Map<String, String> columnCommentMap = menuConfig.getColumnCommentMap();
 //        if (queryConfig.getTable() != null && !Objects.equals(queryConfig.getTable(), menuConfig.getTable())) {
-//            List<ColumnVO> coulumns = DatabaseMetaDataUtil.getCoulumns(queryConfig.getTable());
+            List<ColumnVO> coulumns = DatabaseMetaDataUtil.getCoulumns(queryConfig.getTable());
 //            columnCommentMap = coulumns.stream().collect(Collectors.toMap(ColumnVO::getComment, ColumnVO::getColumnName, (v1, v2) -> v1));
 //        }
-
-        //前端配置模版
-        Map<String, FrontendItemConfigBO> frontendItemConfigBOMap = new HashMap<>();
 
 
         String[] fields = queryConfig.getQueryFields().split(SparrowBackendConstant.COMMA_SEPARATOR);

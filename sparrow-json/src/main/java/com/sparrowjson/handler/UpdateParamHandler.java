@@ -43,12 +43,12 @@ public class UpdateParamHandler implements VariableHandler {
         String config = sparrowBackendConfigDTO.getConfig();
         String insertFieldStr = null;
         String tableName = null;
-        if (backConfig instanceof UpdateConfig){
+        if (backConfig instanceof UpdateConfig) {
             UpdateConfig updateConfig = (UpdateConfig) backConfig;
             insertFieldStr = updateConfig.getUpdateFields();
             tableName = updateConfig.getTableName();
         }
-        if (backConfig instanceof DeleteConfig){
+        if (backConfig instanceof DeleteConfig) {
             DeleteConfig deleteConfig = (DeleteConfig) backConfig;
             insertFieldStr = deleteConfig.getUpdateFields();
             tableName = deleteConfig.getTableName();
@@ -57,14 +57,14 @@ public class UpdateParamHandler implements VariableHandler {
             return backendVariablesVO;
         }
 
-        Map<String, String> columnCommentMap = menuConfig.getColumnCommentMap();
-        if (tableName != null && !Objects.equals(tableName, menuConfig.getTable())) {
-            List<ColumnVO> coulumns = DatabaseMetaDataUtil.getCoulumns(tableName);
-            columnCommentMap = coulumns.stream().collect(Collectors.toMap(ColumnVO::getComment, ColumnVO::getColumnName, (v1, v2) -> v1));
-        }
+//        Map<String, String> columnCommentMap = menuConfig.getColumnCommentMap();
+//        if (tableName != null && !Objects.equals(tableName, menuConfig.getTable())) {
+//            List<ColumnVO> coulumns = DatabaseMetaDataUtil.getCoulumns(tableName);
+//            columnCommentMap = coulumns.stream().collect(Collectors.toMap(ColumnVO::getComment, ColumnVO::getColumnName, (v1, v2) -> v1));
+//        }
 
         //前端配置模版
-        Map<String, FrontendItemConfigBO> frontendItemConfigBOMap = new HashMap<>();
+        Map<String, FrontendItemConfigBO> frontendItemConfigBOMap = menuConfig.getFrontendItemConfigBOMap();
 
         String[] insertFields = insertFieldStr.split(SparrowBackendConstant.COMMA_SEPARATOR);
 
@@ -72,13 +72,15 @@ public class UpdateParamHandler implements VariableHandler {
         for (String tableField : insertFields) {
             TableInsertDTO tableInsertDTO = new TableInsertDTO();
 
-            String realTableField = columnCommentMap.get(tableField);
-            if (StringUtil.isBlank(realTableField)) {
-                throw new IllegalArgumentException("字段:" + tableField + "没有对应的数据库字段");
-            }
-
+//            String realTableField = columnCommentMap.get(tableField);
+//            if (StringUtil.isBlank(realTableField)) {
+//                throw new IllegalArgumentException("字段:" + tableField + "没有对应的数据库字段");
+//            }
+            FrontendItemConfigBO frontendItemConfigBO = frontendItemConfigBOMap.get(tableField);
+            String realTableField = frontendItemConfigBO.getValue();
             tableInsertDTO.setTableField(realTableField);
             tableInsertDTO.setUpdateField(SnakeToCamelUtil.toCamelCase(realTableField));
+            tableInsertDTO.setUpdateField(frontendItemConfigBO.getTargetField());
             tableInsertDTOS.add(tableInsertDTO);
         }
         config = config.replace("${updateParam}", JSON.toJSONString(tableInsertDTOS));

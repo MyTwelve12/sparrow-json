@@ -136,10 +136,18 @@ public class Test {
 
     private void queryBackendList(MenuConfig menuConfig, List<BackendVO> backendList) {
         List<QueryConfig> insertConfigs = menuConfig.getQueryConfigs();
+        Map<String, FrontendItemConfigBO> frontendItemConfigBOMap = menuConfig.getFrontendItemConfigBOMap();
         for (QueryConfig insertConfig : insertConfigs) {
             //2.构建，templateAlias，endpoint
             BackendVO backendVO = new BackendVO();
-            backendVO.setTemplateAlias(insertConfig.getTemplateAlias() + ChineseToPinyinUtil.toPinyin(insertConfig.getName()));
+            //backendVO.setTemplateAlias(insertConfig.getTemplateAlias() + ChineseToPinyinUtil.toPinyin(insertConfig.getName()));
+            if (frontendItemConfigBOMap.get(insertConfig.getName()) != null) {
+                backendVO.setTemplateAlias(frontendItemConfigBOMap.get(insertConfig.getName()).getShowField());
+            }else{
+                //
+                backendVO.setTemplateAlias(insertConfig.getTemplateAlias() + ChineseToPinyinUtil.toPinyin(insertConfig.getName()));
+            }
+
             BackendEndpointVO endpointVO = new BackendEndpointVO();
             endpointVO.setType(1);
             endpointVO.setMethod("POST");
@@ -169,10 +177,19 @@ public class Test {
 
     private void deleteBackendList(MenuConfig menuConfig, List<BackendVO> backendList) {
         List<DeleteConfig> insertConfigs = menuConfig.getDeleteConfigs();
+        Map<String, FrontendItemConfigBO> frontendItemConfigBOMap = menuConfig.getFrontendItemConfigBOMap();
         for (DeleteConfig insertConfig : insertConfigs) {
             //2.构建，templateAlias，endpoint
             BackendVO backendVO = new BackendVO();
-            backendVO.setTemplateAlias(insertConfig.getTemplateAlias() + ChineseToPinyinUtil.toPinyin(insertConfig.getName()));
+            //backendVO.setTemplateAlias(insertConfig.getTemplateAlias() + ChineseToPinyinUtil.toPinyin(insertConfig.getName()));
+
+            if (frontendItemConfigBOMap.get(insertConfig.getName()) != null) {
+                backendVO.setTemplateAlias(frontendItemConfigBOMap.get(insertConfig.getName()).getShowField());
+            }else{
+                //
+                backendVO.setTemplateAlias(insertConfig.getTemplateAlias() + ChineseToPinyinUtil.toPinyin(insertConfig.getName()));
+            }
+
             BackendEndpointVO endpointVO = new BackendEndpointVO();
             endpointVO.setType(1);
             endpointVO.setMethod("POST");
@@ -202,10 +219,19 @@ public class Test {
 
     private void updateBackendList(MenuConfig menuConfig, List<BackendVO> backendList) {
         List<UpdateConfig> insertConfigs = menuConfig.getUpdateConfigs();
+        Map<String, FrontendItemConfigBO> frontendItemConfigBOMap = menuConfig.getFrontendItemConfigBOMap();
         for (UpdateConfig insertConfig : insertConfigs) {
             //2.构建，templateAlias，endpoint
             BackendVO backendVO = new BackendVO();
-            backendVO.setTemplateAlias(insertConfig.getTemplateAlias() + ChineseToPinyinUtil.toPinyin(insertConfig.getName()));
+            //backendVO.setTemplateAlias(insertConfig.getTemplateAlias() + ChineseToPinyinUtil.toPinyin(insertConfig.getName()));
+            if (frontendItemConfigBOMap.get(insertConfig.getName()) != null) {
+                backendVO.setTemplateAlias(frontendItemConfigBOMap.get(insertConfig.getName()).getShowField());
+            }else{
+                //
+                backendVO.setTemplateAlias(insertConfig.getTemplateAlias() + ChineseToPinyinUtil.toPinyin(insertConfig.getName()));
+            }
+
+
             BackendEndpointVO endpointVO = new BackendEndpointVO();
             endpointVO.setType(1);
             endpointVO.setMethod("POST");
