@@ -145,8 +145,7 @@ public class Test {
             endpointVO.setMethod("POST");
             endpointVO.setPath(TEMPLATE_CODE_PREFIX + "/" + backendVO.getTemplateAlias() + "/" + DateUtil.dateToString(DateUtil.getCurrentDate(),
                     "yyyyMMddHH"));
-            endpointVO.setName(insertConfig.getName() + DateUtil.dateToString(DateUtil.getCurrentDate(),
-                    "yyyyMMddHH"));
+            endpointVO.setName(insertConfig.getName());
             endpointVO.setAppId("10000324");
             backendVO.setEndpoint(endpointVO);
             List<BackendVariablesVO> variablesVOS = Lists.newArrayList();
@@ -178,8 +177,7 @@ public class Test {
             endpointVO.setMethod("POST");
             endpointVO.setPath(TEMPLATE_CODE_PREFIX + "/" + backendVO.getTemplateAlias() + "/" + DateUtil.dateToString(DateUtil.getCurrentDate(),
                     "yyyyMMddHH"));
-            endpointVO.setName(insertConfig.getName() + DateUtil.dateToString(DateUtil.getCurrentDate(),
-                    "yyyyMMddHH"));
+            endpointVO.setName(insertConfig.getName());
             endpointVO.setAppId("10000324");
             backendVO.setEndpoint(endpointVO);
             List<BackendVariablesVO> variablesVOS = Lists.newArrayList();
@@ -212,8 +210,7 @@ public class Test {
             endpointVO.setPath(TEMPLATE_CODE_PREFIX + "/" + backendVO.getTemplateAlias()
                     + "/" + DateUtil.dateToString(DateUtil.getCurrentDate(),
                     "yyyyMMddHH"));
-            endpointVO.setName(insertConfig.getName() + DateUtil.dateToString(DateUtil.getCurrentDate(),
-                    "yyyyMMddHH"));
+            endpointVO.setName(insertConfig.getName());
             endpointVO.setAppId("10000324");
             backendVO.setEndpoint(endpointVO);
             List<BackendVariablesVO> variablesVOS = Lists.newArrayList();
@@ -256,8 +253,7 @@ public class Test {
             endpointVO.setMethod("POST");
             endpointVO.setPath(TEMPLATE_CODE_PREFIX + "/" + backendVO.getTemplateAlias()
                     + "/" + DateUtil.dateToString(DateUtil.getCurrentDate(), "yyyyMMddHH"));
-            endpointVO.setName(insertConfig.getName() + DateUtil.dateToString(DateUtil.getCurrentDate(),
-                    "yyyyMMddHH"));
+            endpointVO.setName(insertConfig.getName());
             endpointVO.setAppId("10000324");
             backendVO.setEndpoint(endpointVO);
             List<BackendVariablesVO> variablesVOS = Lists.newArrayList();

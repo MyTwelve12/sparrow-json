@@ -37,7 +37,7 @@ public class ResultRuleHandler implements VariableHandler {
 
         List<String> rpcList = queryConfig.getRpcList();
         if (CollectionUtils.isEmpty(rpcList)) {
-            return backendVariablesVO;
+            return null;
         }
         List<TableQueryRpcDTO> resultRules = Lists.newArrayList();
 
