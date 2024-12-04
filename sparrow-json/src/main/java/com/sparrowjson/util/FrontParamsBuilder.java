@@ -3,8 +3,8 @@ package com.sparrowjson.util;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.sparrowjson.vo.unit.FrontendItemConfigBO;
-import org.springframework.util.StringUtils;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -123,7 +123,7 @@ public class FrontParamsBuilder {
                 //为了解析判断当前的是数组还是object
 
 //                String mappedChildKey = hashMap.getOrDefault(childKey, childKey);
-                String mappedChildKey = getDefaultMapValue(childKey, childKey, false);
+                Object mappedChildKey = getDefaultMapValue(childKey, childKey, false);
                 String childValue = childParts.length > 1 ? childParts[1].trim() : "";
 
                 // 检查是否是对象或数组声明
@@ -133,12 +133,12 @@ public class FrontParamsBuilder {
                     String childType = childKey.substring(startIndex + 1, endIndex).trim().toLowerCase();
                     String realChildKey = childKey.substring(0, startIndex).trim();
 //                    String mappedRealChildKey = hashMap.getOrDefault(realChildKey, realChildKey);
-                    String mappedRealChildKey = getDefaultMapValue(realChildKey, realChildKey, false);
+                    Object mappedRealChildKey = getDefaultMapValue(realChildKey, realChildKey, false);
 
                     if ("array".equals(childType)) {
-                        obj.put(mappedRealChildKey, parseArray(nextLevel));
+                        obj.put((String) mappedRealChildKey, parseArray(nextLevel));
                     } else if ("object".equals(childType)) {
-                        obj.put(mappedRealChildKey, parseObject(nextLevel));
+                        obj.put((String) mappedRealChildKey, parseObject(nextLevel));
                     }
                 } else if (childValue.contains(" ") && !childValue.startsWith("\"")) {
                     // 检查是否在object内部
@@ -152,16 +152,21 @@ public class FrontParamsBuilder {
                                 String propKey = propParts[0].trim();
                                 String propValue = propParts[1].trim();
 //                                String mappedPropKey = hashMap.getOrDefault(propKey, propKey);
-                                String mappedPropKey = getDefaultMapValue(propKey, propKey, false);
+                                Object mappedPropKey = getDefaultMapValue(propKey, propKey, false);
 //                                String mappedPropValue = hashMap.getOrDefault(propValue, propValue);
 
-                                String mappedPropValue = getDefaultMapValue(propValue, propValue, true);
-                                obj.put(mappedPropKey, mappedPropValue);
+                                Object mappedPropValue = getDefaultMapValue(propValue, propValue, true);
+                                obj.put((String) mappedPropKey, mappedPropValue);
                             } else {
                                 //todo 处理上层是object,下层是多个元素的场景处理第一个元素
                                 //String newChildKey = hashMap.get(childKey) != "" ? hashMap.get(childKey) : childKey;
-                                String newChildKey = getDefaultMapValue(childKey, childKey, false);
-                                obj.put(newChildKey, prop);
+                                Object newChildKey = getDefaultMapValue(childKey, childKey, false);
+                                if (Arrays.asList("true", "false").contains(prop)) {
+                                    obj.put((String) newChildKey, Boolean.valueOf(prop));
+                                } else {
+                                    obj.put((String) newChildKey, prop);
+                                }
+
                             }
                         }
                         currentIndex++;
@@ -176,22 +181,22 @@ public class FrontParamsBuilder {
                                 String propValue = propParts[1].trim();
                                 //String mappedPropKey = hashMap.getOrDefault(propKey, propKey);
 
-                                String mappedPropKey = getDefaultMapValue(propKey, propKey, false);
+                                Object mappedPropKey = getDefaultMapValue(propKey, propKey, false);
                                 // String mappedPropValue = hashMap.getOrDefault(propValue, propValue);
-                                String mappedPropValue = getDefaultMapValue(propValue, propValue, true);
+                                Object mappedPropValue = getDefaultMapValue(propValue, propValue, true);
 
-                                childObj.put(mappedPropKey, mappedPropValue);
+                                childObj.put((String) mappedPropKey, mappedPropValue);
                             }
                         }
-                        obj.put(mappedChildKey, childObj);
+                        obj.put((String) mappedChildKey, childObj);
                         currentIndex++;
                     }
                 } else if (childValue.isEmpty()) {
-                    obj.put(mappedChildKey, parseObject(nextLevel));
+                    obj.put((String) mappedChildKey, parseObject(nextLevel));
                 } else {
 //                    String mappedValue = hashMap.getOrDefault(childValue, childValue);
-                    String mappedValue = getDefaultMapValue(childValue, childValue,true);
-                    obj.put(mappedChildKey, mappedValue);
+                    Object mappedValue = getDefaultMapValue(childValue, childValue, true);
+                    obj.put((String) mappedChildKey, mappedValue);
                     currentIndex++;
                 }
             } else {
@@ -203,8 +208,8 @@ public class FrontParamsBuilder {
         if (level == 1) {
             JSONObject result = new JSONObject();
 //            String mappedKey = hashMap.getOrDefault(key, key);
-            String mappedKey = getDefaultMapValue(key, key, false);
-            result.put(mappedKey, obj);
+            Object mappedKey = getDefaultMapValue(key, key, false);
+            result.put((String) mappedKey, obj);
             return result;
         }
 
@@ -217,11 +222,11 @@ public class FrontParamsBuilder {
             String propKey = propParts[0].trim();
             String propValue = propParts[1].trim();
 //            String mappedPropKey = hashMap.getOrDefault(propKey, propKey);
-            String mappedPropKey = getDefaultMapValue(propKey, propKey, false);
+            Object mappedPropKey = getDefaultMapValue(propKey, propKey, false);
 
 //            String mappedPropValue = hashMap.getOrDefault(propValue, propValue);
-            String mappedPropValue = getDefaultMapValue(propValue, propValue, true);
-            obj.put(mappedPropKey, mappedPropValue);
+            Object mappedPropValue = getDefaultMapValue(propValue, propValue, true);
+            obj.put((String) mappedPropKey, mappedPropValue);
         }
     }
 
@@ -288,7 +293,12 @@ public class FrontParamsBuilder {
                                     JSONObject jsonItem = new JSONObject();
                                     for (String key1 : jsonObject11.keySet()) {
 //                                        jsonItem.put(hashMap.get(key1) != null ? hashMap.get(key1) : key1, jsonObject11.get(key1));
-                                        jsonItem.put(hashMap.get(key1) != null ? hashMap.get(key1).getShowField() : key1, jsonObject11.get(key1));
+                                        if (Arrays.asList("true", "false").contains(jsonObject11.get(key1).toString())) {
+                                            jsonItem.put(hashMap.get(key1) != null ? hashMap.get(key1).getShowField() : key1, Boolean.valueOf(jsonObject11.get(key1).toString()));
+                                        } else {
+                                            jsonItem.put(hashMap.get(key1) != null ? hashMap.get(key1).getShowField() : key1, jsonObject11.get(key1));
+                                        }
+
 
                                     }
                                     propResultArray.add(jsonItem);
@@ -296,7 +306,12 @@ public class FrontParamsBuilder {
 //                                obj.put(propKey, JSONArray.parseArray(propValue));
                                 obj.put(propKey, propResultArray);
                             } catch (Exception e) {
-                                obj.put(propKey, propValue);
+                                if (Arrays.asList("true", "false").contains(propValue)) {
+                                    obj.put(propKey, Boolean.valueOf(propValue));
+                                } else {
+                                    obj.put(propKey, propValue);
+                                }
+
                             }
                         } else if (propValue.startsWith("{") && propValue.endsWith("}")) {
                             obj.put(propKey, JSONObject.parseObject(propValue));
@@ -317,7 +332,7 @@ public class FrontParamsBuilder {
                             //中文替换
                             getDefaultMapValue(propValue, propValue, true);
 //                            String finalChildValue = StringUtils.isEmpty(hashMap.get(propValue)) ? propValue : hashMap.get(propValue);
-                            String finalChildValue = getDefaultMapValue(propValue, propValue, true);
+                            Object finalChildValue = getDefaultMapValue(propValue, propValue, true);
                             obj.put(propKey, finalChildValue);
                         }
                     }
@@ -343,18 +358,36 @@ public class FrontParamsBuilder {
     }
 
 
-    private String getDefaultMapValue(String key, String value, boolean isTarget) {
+    /**
+     * 获取默认的map数据
+     *
+     * @param key
+     * @param value
+     * @param isTarget 是否目标字段
+     * @return
+     */
+    private Object getDefaultMapValue(String key, String value, boolean isTarget) {
 
         FrontendItemConfigBO frontendItemConfigBO = hashMap.get(key);
         if (frontendItemConfigBO != null) {
             if (isTarget) {
-                return frontendItemConfigBO.getTargetField();
+                if (Arrays.asList("true", "false").contains(frontendItemConfigBO.getTargetField())) {
+                    return Boolean.valueOf(frontendItemConfigBO.getTargetField());
+                } else {
+                    return frontendItemConfigBO.getTargetField();
+                }
+
             } else {
                 return frontendItemConfigBO.getShowField();
             }
 
         }
-        return value;
+        if (Arrays.asList("true", "false").contains(value)) {
+            return Boolean.valueOf(value);
+        } else {
+            return value;
+        }
+//        return value;
 
     }
 
