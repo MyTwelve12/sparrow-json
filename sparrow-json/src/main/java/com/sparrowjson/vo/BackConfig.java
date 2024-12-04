@@ -21,6 +21,8 @@ public class BackConfig {
 
     private List<String> ruleDB;
 
+    private List<String> rpcList;
+
     public void addOnlyOneCheck(String value) {
         if (onlyOneCheck == null) {
             onlyOneCheck = new ArrayList<>();
@@ -33,5 +35,12 @@ public class BackConfig {
             ruleDB = new ArrayList<>();
         }
         ruleDB.add(value);
+    }
+
+    public void addRpcList(String value) {
+        if (rpcList == null) {
+            rpcList = new ArrayList<>();
+        }
+        rpcList.add(value);
     }
 }
