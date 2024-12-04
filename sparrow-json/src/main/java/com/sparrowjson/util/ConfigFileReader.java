@@ -302,6 +302,9 @@ public class ConfigFileReader {
             case "多表连接查询数据表":
                 queryConfig.setMultiTables(value);
                 break;
+            case "rpc方法调用":
+                queryConfig.addRpcList(value);
+                break;
         }
     }
 
