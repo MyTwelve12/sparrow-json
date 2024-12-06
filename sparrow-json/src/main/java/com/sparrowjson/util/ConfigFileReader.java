@@ -212,7 +212,7 @@ public class ConfigFileReader {
             case "批量新增字段":
                 insertConfig.setBatchInsertFields(value);
                 break;
-            case "新增数据库表":
+            case "数据库表":
                 insertConfig.setTableName(value);
                 break;
         }
@@ -240,7 +240,7 @@ public class ConfigFileReader {
             case "功能描述":
                 updateConfig.setName(value);
                 break;
-            case "更新数据库表":
+            case "数据库表":
                 updateConfig.setTableName(value);
                 break;
         }
@@ -268,7 +268,7 @@ public class ConfigFileReader {
             case "功能描述":
                 deleteConfig.setName(value);
                 break;
-            case "更新数据库表":
+            case "数据库表":
                 deleteConfig.setTableName(value);
                 break;
         }

@@ -17,6 +17,8 @@ import java.util.List;
 @Data
 public class BackConfig {
 
+    private String tableName;
+
     private List<String> onlyOneCheck;
 
     private List<String> ruleDB;

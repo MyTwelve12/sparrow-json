@@ -21,5 +21,4 @@ public class UpdateConfig extends BackConfig {
 
     private String name;
 
-    private String tableName;
 }

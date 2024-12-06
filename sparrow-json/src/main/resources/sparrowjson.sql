@@ -139,50 +139,50 @@ CREATE TABLE `t_cms_role_menu_rlt` (
 
 ####渠道组表###
 CREATE TABLE t_channel_group (
-                                 tid int(11) NOT NULL AUTO_INCREMENT COMMENT '主键',
-                                 name varchar(255) DEFAULT NULL COMMENT '渠道组名称',
-                                 effect_status int(11) DEFAULT NULL COMMENT '生效状态',
-                                 start_time datetime DEFAULT NULL COMMENT '生效开始时间',
-                                 end_time datetime DEFAULT NULL COMMENT '生效结束时间',
-                                 status int(11) DEFAULT '0' COMMENT '状态',
-                                 create_by varchar(64) DEFAULT NULL COMMENT '创建人',
-                                 create_time datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-                                 update_by varchar(64) DEFAULT NULL COMMENT '更新人',
-                                 update_time datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
-                                 del_flag int(11) NOT NULL DEFAULT '1' COMMENT '删除标志',
-                                 PRIMARY KEY (tid)
+tid int(11) NOT NULL AUTO_INCREMENT COMMENT '主键',
+name varchar(255) DEFAULT NULL COMMENT '渠道组名称',
+effect_status int(11) DEFAULT NULL COMMENT '生效状态',
+start_time datetime DEFAULT NULL COMMENT '生效开始时间',
+end_time datetime DEFAULT NULL COMMENT '生效结束时间',
+status int(11) DEFAULT '0' COMMENT '状态',
+create_by varchar(64) DEFAULT NULL COMMENT '创建人',
+create_time datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+update_by varchar(64) DEFAULT NULL COMMENT '更新人',
+update_time datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+del_flag int(11) NOT NULL DEFAULT '1' COMMENT '删除标志',
+PRIMARY KEY (tid)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COMMENT='渠道组表';
 
 ####渠道组关联表###
 CREATE TABLE t_channel_group_relation (
-                                          tid int(11) NOT NULL AUTO_INCREMENT COMMENT '主键',
-                                          channel_group_id int(11) NOT NULL COMMENT '渠道组ID',
-                                          type int(11) DEFAULT NULL COMMENT '类型',
-                                          channel_id int(11) NOT NULL COMMENT '渠道ID',
-                                          goods_group_id int(11) NOT NULL COMMENT '商品组ID',
-                                          create_by varchar(64) DEFAULT NULL COMMENT '创建人',
-                                          create_time datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-                                          update_by varchar(64) DEFAULT NULL COMMENT '更新人',
-                                          update_time datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
-                                          del_flag int(11) NOT NULL DEFAULT '1' COMMENT '删除标志',
-                                          PRIMARY KEY (tid),
-                                          KEY idx_channel_group_id (channel_group_id)
+tid int(11) NOT NULL AUTO_INCREMENT COMMENT '主键',
+channel_group_id int(11) NOT NULL COMMENT '渠道组ID',
+type int(11) DEFAULT NULL COMMENT '类型',
+channel_id int(11) NOT NULL COMMENT '渠道ID',
+goods_group_id int(11) NOT NULL COMMENT '商品组ID',
+create_by varchar(64) DEFAULT NULL COMMENT '创建人',
+create_time datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+update_by varchar(64) DEFAULT NULL COMMENT '更新人',
+update_time datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+del_flag int(11) NOT NULL DEFAULT '1' COMMENT '删除标志',
+PRIMARY KEY (tid),
+KEY idx_channel_group_id (channel_group_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='渠道组关联表';
 
 
 ####商品组表###
 CREATE TABLE t_goods_group (
-                               tid int(11) NOT NULL AUTO_INCREMENT COMMENT '主键',
-                               name varchar(255) DEFAULT NULL COMMENT '商品组名称',
-                               type int(11) DEFAULT NULL COMMENT '商品组类型',
-                               effect_status int(11) DEFAULT NULL COMMENT '生效状态',
-                               start_time datetime DEFAULT NULL COMMENT '生效开始时间',
-                               end_time datetime DEFAULT NULL COMMENT '生效结束时间',
-                               status int(11) DEFAULT '0' COMMENT '状态',
-                               create_by varchar(64) DEFAULT NULL COMMENT '创建人',
-                               create_time datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-                               update_by varchar(64) DEFAULT NULL COMMENT '更新人',
-                               update_time datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
-                               del_flag int(11) NOT NULL DEFAULT '1' COMMENT '删除标志',
-                               PRIMARY KEY (tid)
+tid int(11) NOT NULL AUTO_INCREMENT COMMENT '主键',
+name varchar(255) DEFAULT NULL COMMENT '商品组名称',
+type int(11) DEFAULT NULL COMMENT '商品组类型',
+effect_status int(11) DEFAULT NULL COMMENT '生效状态',
+start_time datetime DEFAULT NULL COMMENT '生效开始时间',
+end_time datetime DEFAULT NULL COMMENT '生效结束时间',
+status int(11) DEFAULT '0' COMMENT '状态',
+create_by varchar(64) DEFAULT NULL COMMENT '创建人',
+create_time datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+update_by varchar(64) DEFAULT NULL COMMENT '更新人',
+update_time datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+del_flag int(11) NOT NULL DEFAULT '1' COMMENT '删除标志',
+PRIMARY KEY (tid)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COMMENT='商品组表';

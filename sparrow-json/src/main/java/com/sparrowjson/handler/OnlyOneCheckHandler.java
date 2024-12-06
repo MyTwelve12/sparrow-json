@@ -3,11 +3,13 @@ package com.sparrowjson.handler;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.sparrowjson.constant.SparrowBackendConstant;
+import com.sparrowjson.database.DatabaseMetaDataUtil;
 import com.sparrowjson.dto.SparrowBackendConfigDTO;
 import com.sparrowjson.enums.TemplateAliasEnum;
 import com.sparrowjson.util.SnakeToCamelUtil;
 import com.sparrowjson.vo.BackConfig;
 import com.sparrowjson.vo.BackendVariablesVO;
+import com.sparrowjson.vo.ColumnVO;
 import com.sparrowjson.vo.MenuConfig;
 import com.google.common.collect.Lists;
 import com.sparrowjson.vo.unit.FrontendItemConfigBO;
@@ -20,6 +22,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 /**
  * Description:
@@ -40,6 +43,12 @@ public class OnlyOneCheckHandler implements VariableHandler {
             return null;
         }
         Map<String, String> columnCommentMap = menuConfig.getColumnCommentMap();
+        String tableName = backConfig.getTableName();
+        if (tableName != null && !Objects.equals(tableName, menuConfig.getTable())) {
+            List<ColumnVO> coulumns = DatabaseMetaDataUtil.getCoulumns(tableName);
+            columnCommentMap = coulumns.stream().collect(Collectors.toMap(ColumnVO::getComment, ColumnVO::getColumnName, (v1, v2) -> v1));
+        }
+
 
         //前端配置模版
         Map<String, FrontendItemConfigBO> frontendItemConfigBOMap = new HashMap<>();
