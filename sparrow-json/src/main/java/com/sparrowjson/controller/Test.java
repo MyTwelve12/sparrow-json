@@ -3,6 +3,7 @@ package com.sparrowjson.controller;
 import com.alibaba.fastjson.JSON;
 import com.google.common.collect.Lists;
 import com.sparrowjson.dto.SparrowBackendConfigDTO;
+import com.sparrowjson.enums.CommonTemplateCodeEnum;
 import com.sparrowjson.handler.VariableHandler;
 import com.sparrowjson.util.ChineseToPinyinUtil;
 import com.sparrowjson.util.DateUtil;
@@ -17,10 +18,12 @@ import com.sparrowjson.vo.QueryConfig;
 import com.sparrowjson.vo.SparrowVO;
 import com.sparrowjson.vo.UpdateConfig;
 import com.sparrowjson.vo.unit.FrontendItemConfigBO;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * Description:
@@ -118,7 +121,9 @@ public class Test {
 
         //1.功能描述获取模板code
         String functionDesc = menuConfig.getFunctionDesc();
-        String templateCode = getTemplateCode(functionDesc);
+//        String templateCode = getTemplateCode(functionDesc);
+        String templateCode =
+                StringUtils.isNotBlank(CommonTemplateCodeEnum.getNameByTemplate(functionDesc)) ? CommonTemplateCodeEnum.getNameByTemplate(functionDesc) : functionDesc;
         sparrowVO.setTemplateCode(templateCode);
         List<BackendVO> backendList = Lists.newArrayList();
         //2.定义后端VO
@@ -136,25 +141,35 @@ public class Test {
 
     private void queryBackendList(MenuConfig menuConfig, List<BackendVO> backendList) {
         List<QueryConfig> insertConfigs = menuConfig.getQueryConfigs();
-        Map<String, FrontendItemConfigBO> frontendItemConfigBOMap = menuConfig.getFrontendItemConfigBOMap();
+        Map<String, FrontendItemConfigBO> configBOMap = menuConfig.getFrontendItemConfigBOMap();
         for (QueryConfig insertConfig : insertConfigs) {
             //2.构建，templateAlias，endpoint
             BackendVO backendVO = new BackendVO();
-            //backendVO.setTemplateAlias(insertConfig.getTemplateAlias() + ChineseToPinyinUtil.toPinyin(insertConfig.getName()));
-            if (frontendItemConfigBOMap.get(insertConfig.getName()) != null) {
-                backendVO.setTemplateAlias(frontendItemConfigBOMap.get(insertConfig.getName()).getShowField());
+            //设置模版别名
+            backendVO.setTemplateAlias(insertConfig.getTemplateAlias());
+
+            //设置功能别名
+            String functionAlias = "";
+            if (configBOMap.get(insertConfig.getName()) != null) {
+                FrontendItemConfigBO configBO = configBOMap.get(insertConfig.getName());
+                functionAlias = configBO.getShowField();
             }else{
-                //
-                backendVO.setTemplateAlias(insertConfig.getTemplateAlias() + ChineseToPinyinUtil.toPinyin(insertConfig.getName()));
+                functionAlias = ChineseToPinyinUtil.toPinyin(insertConfig.getName());
             }
+            backendVO.setFunctionAlias(functionAlias);
+            /**
+             * 功能接口
+             */
+            Map<String, String> functionAliasMap = menuConfig.getFunctionAliasMap();
+            functionAliasMap.put(insertConfig.getName(), functionAlias);
 
             BackendEndpointVO endpointVO = new BackendEndpointVO();
             endpointVO.setType(1);
             endpointVO.setMethod("POST");
-            endpointVO.setPath(TEMPLATE_CODE_PREFIX + "/" + backendVO.getTemplateAlias() + "/" + DateUtil.dateToString(DateUtil.getCurrentDate(),
-                    "yyyyMMddHH"));
+            endpointVO.setPath(TEMPLATE_CODE_PREFIX + "/" + backendVO.getFunctionAlias() + "/" + DateUtil.dateToString(DateUtil.getCurrentDate(),
+                    "yyyyMMddHHmmss"));
             endpointVO.setName(insertConfig.getName() + DateUtil.dateToString(DateUtil.getCurrentDate(),
-                    "yyyyMMddHH"));
+                    "yyyyMMddHHmmss"));
             endpointVO.setAppId("10000324");
             backendVO.setEndpoint(endpointVO);
             List<BackendVariablesVO> variablesVOS = Lists.newArrayList();
@@ -177,26 +192,35 @@ public class Test {
 
     private void deleteBackendList(MenuConfig menuConfig, List<BackendVO> backendList) {
         List<DeleteConfig> insertConfigs = menuConfig.getDeleteConfigs();
-        Map<String, FrontendItemConfigBO> frontendItemConfigBOMap = menuConfig.getFrontendItemConfigBOMap();
+        Map<String, FrontendItemConfigBO> configBOMap = menuConfig.getFrontendItemConfigBOMap();
         for (DeleteConfig insertConfig : insertConfigs) {
             //2.构建，templateAlias，endpoint
             BackendVO backendVO = new BackendVO();
-            //backendVO.setTemplateAlias(insertConfig.getTemplateAlias() + ChineseToPinyinUtil.toPinyin(insertConfig.getName()));
+            //设置模版别名
+            backendVO.setTemplateAlias(insertConfig.getTemplateAlias());
 
-            if (frontendItemConfigBOMap.get(insertConfig.getName()) != null) {
-                backendVO.setTemplateAlias(frontendItemConfigBOMap.get(insertConfig.getName()).getShowField());
+            //设置功能别名
+            String functionAlias = "";
+            if (configBOMap.get(insertConfig.getName()) != null) {
+                FrontendItemConfigBO configBO = configBOMap.get(insertConfig.getName());
+                functionAlias = configBO.getShowField();
             }else{
-                //
-                backendVO.setTemplateAlias(insertConfig.getTemplateAlias() + ChineseToPinyinUtil.toPinyin(insertConfig.getName()));
+                functionAlias = ChineseToPinyinUtil.toPinyin(insertConfig.getName());
             }
+            backendVO.setFunctionAlias(functionAlias);
+            /**
+             * 功能接口
+             */
+            Map<String, String> functionAliasMap = menuConfig.getFunctionAliasMap();
+            functionAliasMap.put(insertConfig.getName(), functionAlias);
 
             BackendEndpointVO endpointVO = new BackendEndpointVO();
             endpointVO.setType(1);
             endpointVO.setMethod("POST");
-            endpointVO.setPath(TEMPLATE_CODE_PREFIX + "/" + backendVO.getTemplateAlias() + "/" + DateUtil.dateToString(DateUtil.getCurrentDate(),
-                    "yyyyMMddHH"));
+            endpointVO.setPath(TEMPLATE_CODE_PREFIX + "/" + backendVO.getFunctionAlias() + "/" + DateUtil.dateToString(DateUtil.getCurrentDate(),
+                    "yyyyMMddHHmmss"));
             endpointVO.setName(insertConfig.getName() + DateUtil.dateToString(DateUtil.getCurrentDate(),
-                    "yyyyMMddHH"));
+                    "yyyyMMddHHmmss"));
             endpointVO.setAppId("10000324");
             backendVO.setEndpoint(endpointVO);
             List<BackendVariablesVO> variablesVOS = Lists.newArrayList();
@@ -218,28 +242,38 @@ public class Test {
     }
 
     private void updateBackendList(MenuConfig menuConfig, List<BackendVO> backendList) {
+        Map<String, FrontendItemConfigBO> configBOMap = menuConfig.getFrontendItemConfigBOMap();
         List<UpdateConfig> insertConfigs = menuConfig.getUpdateConfigs();
-        Map<String, FrontendItemConfigBO> frontendItemConfigBOMap = menuConfig.getFrontendItemConfigBOMap();
         for (UpdateConfig insertConfig : insertConfigs) {
             //2.构建，templateAlias，endpoint
             BackendVO backendVO = new BackendVO();
-            //backendVO.setTemplateAlias(insertConfig.getTemplateAlias() + ChineseToPinyinUtil.toPinyin(insertConfig.getName()));
-            if (frontendItemConfigBOMap.get(insertConfig.getName()) != null) {
-                backendVO.setTemplateAlias(frontendItemConfigBOMap.get(insertConfig.getName()).getShowField());
+            //设置模版别名
+            backendVO.setTemplateAlias(insertConfig.getTemplateAlias());
+
+            //设置功能别名
+            String functionAlias = "";
+            if (configBOMap.get(insertConfig.getName()) != null) {
+                FrontendItemConfigBO configBO = configBOMap.get(insertConfig.getName());
+                functionAlias = configBO.getShowField();
             }else{
-                //
-                backendVO.setTemplateAlias(insertConfig.getTemplateAlias() + ChineseToPinyinUtil.toPinyin(insertConfig.getName()));
+                functionAlias = ChineseToPinyinUtil.toPinyin(insertConfig.getName());
             }
+            backendVO.setFunctionAlias(functionAlias);
+            /**
+             * 功能接口
+             */
+            Map<String, String> functionAliasMap = menuConfig.getFunctionAliasMap();
+            functionAliasMap.put(insertConfig.getName(), functionAlias);
 
 
             BackendEndpointVO endpointVO = new BackendEndpointVO();
             endpointVO.setType(1);
             endpointVO.setMethod("POST");
-            endpointVO.setPath(TEMPLATE_CODE_PREFIX + "/" + backendVO.getTemplateAlias()
+            endpointVO.setPath(TEMPLATE_CODE_PREFIX + "/" + backendVO.getFunctionAlias()
                     + "/" + DateUtil.dateToString(DateUtil.getCurrentDate(),
-                    "yyyyMMddHH"));
+                    "yyyyMMddHHss"));
             endpointVO.setName(insertConfig.getName() + DateUtil.dateToString(DateUtil.getCurrentDate(),
-                    "yyyyMMddHH"));
+                    "yyyyMMddHHss"));
             endpointVO.setAppId("10000324");
             backendVO.setEndpoint(endpointVO);
             List<BackendVariablesVO> variablesVOS = Lists.newArrayList();
@@ -260,29 +294,44 @@ public class Test {
         }
     }
 
+    /**
+     * 后台新增模版
+     *
+     * @param menuConfig
+     * @param backendList
+     */
     private void insertBackendList(MenuConfig menuConfig, List<BackendVO> backendList) {
         List<InsertConfig> insertConfigs = menuConfig.getInsertConfigs();
+        Map<String, FrontendItemConfigBO> configBOMap = menuConfig.getFrontendItemConfigBOMap();
         //获取数据库中的配置数据
-        Map<String, FrontendItemConfigBO> frontendItemConfigBOMap = menuConfig.getFrontendItemConfigBOMap();
         for (InsertConfig insertConfig : insertConfigs) {
             //2.构建，templateAlias，endpoint
             BackendVO backendVO = new BackendVO();
-            //插入的别名不为空
-            if (frontendItemConfigBOMap.get(insertConfig.getName()) != null) {
-                backendVO.setTemplateAlias(frontendItemConfigBOMap.get(insertConfig.getName()).getShowField());
-            }else{
-                //
-                backendVO.setTemplateAlias(insertConfig.getTemplateAlias() + ChineseToPinyinUtil.toPinyin(insertConfig.getName()));
-            }
+            //设置模版别名
+            backendVO.setTemplateAlias(insertConfig.getTemplateAlias());
 
+            //设置功能别名
+            String functionAlias = "";
+            if (configBOMap.get(insertConfig.getName()) != null) {
+                FrontendItemConfigBO configBO = configBOMap.get(insertConfig.getName());
+                functionAlias = configBO.getShowField();
+            }else{
+                functionAlias = ChineseToPinyinUtil.toPinyin(insertConfig.getName());
+            }
+            backendVO.setFunctionAlias(functionAlias);
+            /**
+             * 功能接口
+             */
+            Map<String, String> functionAliasMap = menuConfig.getFunctionAliasMap();
+            functionAliasMap.put(insertConfig.getName(), functionAlias);
 
             BackendEndpointVO endpointVO = new BackendEndpointVO();
             endpointVO.setType(1);
             endpointVO.setMethod("POST");
-            endpointVO.setPath(TEMPLATE_CODE_PREFIX + "/" + backendVO.getTemplateAlias()
-                    + "/" + DateUtil.dateToString(DateUtil.getCurrentDate(), "yyyyMMddHH"));
+            endpointVO.setPath(TEMPLATE_CODE_PREFIX + "/" + backendVO.getFunctionAlias()
+                    + "/" + DateUtil.dateToString(DateUtil.getCurrentDate(), "yyyyMMddHHmmss"));
             endpointVO.setName(insertConfig.getName() + DateUtil.dateToString(DateUtil.getCurrentDate(),
-                    "yyyyMMddHH"));
+                    "yyyyMMddHHmmss"));
             endpointVO.setAppId("10000324");
             backendVO.setEndpoint(endpointVO);
             List<BackendVariablesVO> variablesVOS = Lists.newArrayList();

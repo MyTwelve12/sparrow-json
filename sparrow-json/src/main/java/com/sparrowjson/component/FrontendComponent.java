@@ -43,7 +43,7 @@ public class FrontendComponent {
      * @param templateLines 文件数据
      * @param templateCode  模版code
      */
-    public FrontendVO buildFrontTemplateInfo(List<String> templateLines, String templateCode) {
+    public FrontendVO buildFrontTemplateInfo(List<String> templateLines, String templateCode, String functionDesc) {
 
         String name = "";
 
@@ -53,15 +53,7 @@ public class FrontendComponent {
         if (!CollectionUtils.isEmpty(templateLines)) {
             //获取所有的前端的配置信息
 
-            String functionName = templateLines.get(2);
-            if (!functionName.startsWith(SparrowBackendConstant.FRONT_TEMPLATE_FUNCTION_NAME)) {
-                //不符合规范
-                log.info("前端模版不符合要求，没有功能描述");
-                return null;
-            }
-            String finalFunctionName = functionName.replace(SparrowBackendConstant.FRONT_TEMPLATE_FUNCTION_NAME, "").trim();
-
-            List<FrontendConfigDTO> frontendConfigDTOS = frontendConfigMapper.listByFunctionName(finalFunctionName);
+            List<FrontendConfigDTO> frontendConfigDTOS = frontendConfigMapper.listByFunctionName(functionDesc);
             if (CollectionUtils.isEmpty(frontendConfigDTOS)) {
                 //未配置解析参数
                 log.info("请检查当前前端，当前前端的功能未配置");
@@ -128,12 +120,12 @@ public class FrontendComponent {
                 //当前行
                 String currentLine = templateLines.get(i);
 
-                if (i < 3) {
+                if (i < 2) {
                     //第一第二行是标题和描述需要过滤
                     if (i == 0) {
-                        name = currentLine;
+                        name = currentLine.replace(SparrowBackendConstant.FRONT_PAGE_CONFIG_NAME, "");
                     } else if (i == 1) {
-                        description = currentLine;
+                        description = currentLine.replace(SparrowBackendConstant.FRONT_PAGE_CONFIG_DESC, "");
                     }
                     continue;
                 }
@@ -176,11 +168,6 @@ public class FrontendComponent {
         }
 
         return null;
-    }
-
-
-    public void buildBackTemplateInfo(){
-
     }
 
 

@@ -35,6 +35,8 @@ import java.util.stream.Collectors;
  ********************************************************************/
 @Component("updateCondition")
 public class UpdateConditionHandler implements VariableHandler {
+
+
     @Override
     public BackendVariablesVO convertVariables(SparrowBackendConfigDTO sparrowBackendConfigDTO, MenuConfig menuConfig, BackConfig backConfig) {
         BackendVariablesVO backendVariablesVO = createBackendVariablesVO(sparrowBackendConfigDTO);
@@ -42,12 +44,12 @@ public class UpdateConditionHandler implements VariableHandler {
         String config = sparrowBackendConfigDTO.getConfig();
         String insertFieldStr = null;
         String tableName = null;
-        if (backConfig instanceof UpdateConfig) {
+        if (backConfig instanceof UpdateConfig){
             UpdateConfig updateConfig = (UpdateConfig) backConfig;
             insertFieldStr = updateConfig.getConditions();
             tableName = updateConfig.getTableName();
         }
-        if (backConfig instanceof DeleteConfig) {
+        if (backConfig instanceof DeleteConfig){
             DeleteConfig deleteConfig = (DeleteConfig) backConfig;
             insertFieldStr = deleteConfig.getConditions();
             tableName = deleteConfig.getTableName();
@@ -57,14 +59,12 @@ public class UpdateConditionHandler implements VariableHandler {
         }
 
 
-//        Map<String, String> columnCommentMap = menuConfig.getColumnCommentMap();
-//        if (tableName != null && !Objects.equals(tableName, menuConfig.getTable())) {
-//            List<ColumnVO> coulumns = DatabaseMetaDataUtil.getCoulumns(tableName);
-//            columnCommentMap = coulumns.stream().collect(Collectors.toMap(ColumnVO::getComment, ColumnVO::getColumnName, (v1, v2) -> v1));
-//        }
+        Map<String, String> columnCommentMap = menuConfig.getColumnCommentMap();
+        if (tableName != null && !Objects.equals(tableName, menuConfig.getTable())) {
+            List<ColumnVO> coulumns = DatabaseMetaDataUtil.getCoulumns(tableName);
+            columnCommentMap = coulumns.stream().collect(Collectors.toMap(ColumnVO::getComment, ColumnVO::getColumnName, (v1, v2) -> v1));
+        }
 
-        //前端配置模版
-        Map<String, FrontendItemConfigBO> frontendItemConfigBOMap = menuConfig.getFrontendItemConfigBOMap();
 
         String[] insertFields = insertFieldStr.split(SparrowBackendConstant.COMMA_SEPARATOR);
 
@@ -72,23 +72,15 @@ public class UpdateConditionHandler implements VariableHandler {
         Map<String, Integer> tableFieldIndex = Maps.newHashMap();
         for (String tableField : insertFields) {
             UpdateConditionDTO tableInsertDTO = new UpdateConditionDTO();
-            if (tableField.contains(SparrowBackendConstant.SLASH_SEPARATOR)) {
+            if (tableField.contains(SparrowBackendConstant.SLASH_SEPARATOR)){
                 String[] tableFieldLinker = tableField.split(SparrowBackendConstant.SLASH_SEPARATOR);
                 tableField = tableFieldLinker[0];
                 tableInsertDTO.setLinker(tableFieldLinker[1]);
             }
-//            String realTableField = columnCommentMap.get(tableField);
-//            if (StringUtil.isBlank(realTableField)) {
-//                throw new IllegalArgumentException("字段:" + tableField + "没有对应的数据库字段");
-//            }
-
-            FrontendItemConfigBO frontendItemConfigBO = frontendItemConfigBOMap.get(tableField);
-
-            if (frontendItemConfigBO == null) {
+            String realTableField = columnCommentMap.get(tableField);
+            if (StringUtil.isBlank(realTableField)) {
                 throw new IllegalArgumentException("字段:" + tableField + "没有对应的数据库字段");
             }
-            String realTableField = frontendItemConfigBO.getValue();
-
             tableInsertDTO.setTableField(realTableField);
 
             String insertFieldSuffix = "";
@@ -100,7 +92,7 @@ public class UpdateConditionHandler implements VariableHandler {
                 tableFieldIndex.put(realTableField, 0);
             }
 
-            tableInsertDTO.setUpdateField(frontendItemConfigBO.getTargetField() + insertFieldSuffix);
+            tableInsertDTO.setUpdateField(SnakeToCamelUtil.toCamelCase(realTableField) + insertFieldSuffix);
             tableInsertDTOS.add(tableInsertDTO);
         }
         config = config.replace("${updateCondition}", JSON.toJSONString(tableInsertDTOS));
@@ -108,6 +100,69 @@ public class UpdateConditionHandler implements VariableHandler {
 
         return backendVariablesVO;
     }
+
+//
+//    @Override
+//    public BackendVariablesVO convertVariables(SparrowBackendConfigDTO sparrowBackendConfigDTO, MenuConfig menuConfig, BackConfig backConfig) {
+//        BackendVariablesVO backendVariablesVO = createBackendVariablesVO(sparrowBackendConfigDTO);
+//
+//        String config = sparrowBackendConfigDTO.getConfig();
+//        String insertFieldStr = null;
+//        String tableName = null;
+//        if (backConfig instanceof UpdateConfig) {
+//            UpdateConfig updateConfig = (UpdateConfig) backConfig;
+//            insertFieldStr = updateConfig.getConditions();
+//            tableName = updateConfig.getTableName();
+//        }
+//        if (backConfig instanceof DeleteConfig) {
+//            DeleteConfig deleteConfig = (DeleteConfig) backConfig;
+//            insertFieldStr = deleteConfig.getConditions();
+//            tableName = deleteConfig.getTableName();
+//        }
+//        if (StringUtil.isBlank(insertFieldStr)) {
+//            return backendVariablesVO;
+//        }
+//
+//        //前端配置模版
+//        Map<String, FrontendItemConfigBO> frontendItemConfigBOMap = menuConfig.getFrontendItemConfigBOMap();
+//
+//        String[] insertFields = insertFieldStr.split(SparrowBackendConstant.COMMA_SEPARATOR);
+//
+//        List<UpdateConditionDTO> tableInsertDTOS = Lists.newArrayList();
+//        Map<String, Integer> tableFieldIndex = Maps.newHashMap();
+//        for (String tableField : insertFields) {
+//            UpdateConditionDTO tableInsertDTO = new UpdateConditionDTO();
+//            if (tableField.contains(SparrowBackendConstant.SLASH_SEPARATOR)) {
+//                String[] tableFieldLinker = tableField.split(SparrowBackendConstant.SLASH_SEPARATOR);
+//                tableField = tableFieldLinker[0];
+//                tableInsertDTO.setLinker(tableFieldLinker[1]);
+//            }
+//            FrontendItemConfigBO frontendItemConfigBO = frontendItemConfigBOMap.get(tableField);
+//
+//            if (frontendItemConfigBO == null) {
+//                throw new IllegalArgumentException("字段:" + tableField + "没有对应的数据库字段");
+//            }
+//            String realTableField = frontendItemConfigBO.getValue();
+//
+//            tableInsertDTO.setTableField(realTableField);
+//
+//            String insertFieldSuffix = "";
+//            //相同字段-拼接后缀
+//            if (tableFieldIndex.containsKey(realTableField)) {
+//                tableFieldIndex.put(realTableField, tableFieldIndex.get(realTableField) + 1);
+//                insertFieldSuffix = "_" + tableFieldIndex.get(realTableField);
+//            } else {
+//                tableFieldIndex.put(realTableField, 0);
+//            }
+//
+//            tableInsertDTO.setUpdateField(frontendItemConfigBO.getTargetField() + insertFieldSuffix);
+//            tableInsertDTOS.add(tableInsertDTO);
+//        }
+//        config = config.replace("${updateCondition}", JSON.toJSONString(tableInsertDTOS));
+//        backendVariablesVO.setValue(config);
+//
+//        return backendVariablesVO;
+//    }
 
     @Data
     public static class UpdateConditionDTO {

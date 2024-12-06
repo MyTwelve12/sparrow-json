@@ -12,6 +12,7 @@ package com.sparrowjson.controller;
 
 import com.alibaba.fastjson.JSON;
 import com.sparrowjson.component.FrontendComponent;
+import com.sparrowjson.constant.SparrowBackendConstant;
 import com.sparrowjson.database.DatabaseMetaDataUtil;
 import com.sparrowjson.dto.FrontendConfigDTO;
 import com.sparrowjson.dto.SparrowBackendConfigDTO;
@@ -21,6 +22,7 @@ import com.sparrowjson.util.BackAndFrontTemplateBuildUtils;
 import com.sparrowjson.util.ConfigFileReader;
 import com.sparrowjson.vo.ColumnVO;
 import com.sparrowjson.vo.FrontendVO;
+import com.sparrowjson.vo.FrontendVariablesVO;
 import com.sparrowjson.vo.MenuConfig;
 import com.sparrowjson.vo.SparrowVO;
 import com.sparrowjson.vo.unit.FileDataUnitBO;
@@ -35,6 +37,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.*;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -128,8 +131,11 @@ public class TestJson1Controller {
          */
         MenuConfig config = templateBuildUtils.buildBackendConfig(fileDataUnitBO.getBackList());
 
-        //处理前端
-        FrontendVO frontendVO = frontendComponent.buildFrontTemplateInfo(fileDataUnitBO.getFrontList(), "1");
+        //功能描述
+        String functionDesc = config.getFunctionDesc();
+
+        //处理前端 资源管理
+        FrontendVO frontendVO = frontendComponent.buildFrontTemplateInfo(fileDataUnitBO.getFrontList(), "1", functionDesc);
 
         Test test = new Test();
         test.setAddList(addList);
@@ -141,7 +147,7 @@ public class TestJson1Controller {
         config.setCoulumns(coulumns);
 
         //查询当前的后端的配置数据
-        List<FrontendConfigDTO> frontendConfigDTOS = frontendConfigMapper.listByFunctionName("资源管理");
+        List<FrontendConfigDTO> frontendConfigDTOS = frontendConfigMapper.listByFunctionName(functionDesc);
         Map<String, FrontendItemConfigBO> itemConfigBOMap = new HashMap<>();
         if (!CollectionUtils.isEmpty(frontendConfigDTOS)) {
             List<String> valueList =
@@ -152,6 +158,26 @@ public class TestJson1Controller {
         config.setFrontendItemConfigBOMap(itemConfigBOMap);
         SparrowVO sparrowVO = test.buildSparrowBackJSON(config);
         sparrowVO.setFrontend(frontendVO);
+        Map<String, String> functionMap = config.getFunctionAliasMap();
+        List<FrontendVariablesVO> frontendVariablesVOS = new ArrayList<>();
+        if (!CollectionUtils.isEmpty(functionMap)) {
+            for (String key : functionMap.keySet()) {
+                FrontendVariablesVO frontendVariablesVO = JSON.parseObject(SparrowBackendConstant.FRONT_COMMON_URL_VALUE, FrontendVariablesVO.class);
+                frontendVariablesVO.setName(functionMap.get(key));
+                frontendVariablesVO.setDesc(key);
+                String value = frontendVariablesVO.getValue();
+                String realValue = value.replace(SparrowBackendConstant.FRONT_SPLIT_PARAMS, functionMap.get(key));
+                frontendVariablesVO.setValue(realValue);
+                frontendVariablesVOS.add(frontendVariablesVO);
+            }
+        }
+        //设置前段
+        if (!CollectionUtils.isEmpty(frontendVariablesVOS)) {
+            List<FrontendVariablesVO> list = frontendVO.getVariables();
+            list.addAll(frontendVariablesVOS);
+            frontendVO.setVariables(list);
+        }
+
         return JSON.toJSONString(sparrowVO);
     }
 

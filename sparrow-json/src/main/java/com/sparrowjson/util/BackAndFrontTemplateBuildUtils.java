@@ -7,8 +7,10 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sparrowjson.vo.MenuConfig;
 import com.sparrowjson.vo.unit.FrontendItemConfigBO;
+import org.springframework.util.CollectionUtils;
 
 import java.io.*;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -29,6 +31,7 @@ public class BackAndFrontTemplateBuildUtils {
         ConfigFileReader reader = new ConfigFileReader();
         MenuConfig config = new MenuConfig();
         Map<String, Integer> currentIndexMap = new HashMap<>();  // 记录当前处理的索引
+        List<String> linesList = new ArrayList<>();
         for (String line : backList) {
             // 解析基本信息
             if (line.startsWith("功能描述=")) {
@@ -44,8 +47,17 @@ public class BackAndFrontTemplateBuildUtils {
             }
             // 解析带索引的配置
             else {
-                reader.parseIndexedConfig(line, config, currentIndexMap);
+                //解析当前的文档中的类型，区分不同的接口
+                if (line.startsWith("【类型】") && !CollectionUtils.isEmpty(linesList)) {
+                    //调用parseIndexedConfigV2
+                    reader.parseIndexedConfigV2(linesList, config, currentIndexMap);
+                    linesList = new ArrayList<>();
+                }
+                linesList.add(line);
             }
+        }
+        if (!CollectionUtils.isEmpty(linesList)) {
+            reader.parseIndexedConfigV2(linesList, config, currentIndexMap);
         }
         return config;
     }
@@ -104,7 +116,6 @@ public class BackAndFrontTemplateBuildUtils {
         return map;
 
     }
-
 
 
     /**

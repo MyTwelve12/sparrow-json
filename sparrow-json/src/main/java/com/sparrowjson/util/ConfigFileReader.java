@@ -11,6 +11,7 @@ package com.sparrowjson.util;
  ********************************************************************/
 
 import cn.hutool.core.io.FileUtil;
+import com.alibaba.fastjson.JSON;
 import com.sparrowjson.constant.SparrowBackendConstant;
 import com.sparrowjson.vo.CreateTableConfig;
 import com.sparrowjson.vo.DeleteConfig;
@@ -20,6 +21,8 @@ import com.sparrowjson.vo.MenuConfig;
 import com.sparrowjson.vo.QueryConfig;
 import com.sparrowjson.vo.UpdateConfig;
 import com.sparrowjson.vo.unit.FileDataUnitBO;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.util.CollectionUtils;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -28,6 +31,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 
 public class ConfigFileReader {
@@ -130,8 +134,87 @@ public class ConfigFileReader {
     }
 
 
+    /**
+     * v2版本的后段解析模版
+     * 【类型】=查询
+     * 【功能描述】=总部资源列表查询
+     * 查询目标字段=资源管理菜单.主键id,资源管理菜单.名称,资源管理菜单.菜单代码,资源管理菜单.菜单图标,资源管理菜单.页面路由,资源管理菜单.类型,资源管理菜单.权限级别,资源管理菜单.层级,资源管理菜单.排序,资源管理菜单.上级目录,资源管理菜单.层级关系,资源管理菜单.按钮数量,资源管理菜单.渠道标识,资源管理菜单.创建人ID,资源管理菜单.创建时间,资源管理菜单.更新人ID,资源管理菜单.更新时间,资源管理菜单.删除标志,资源管理菜单.系统类型,资源管理菜单.菜单状态
+     * 数据库表=t_cms_menu
+     * 是否需要分页=是
+     * 排序字段=资源管理菜单.排序/升序
+     * 查询参数字段=资源管理菜单.名称/like,资源管理菜单.更新人ID/=,资源管理菜单.类型/=,资源管理菜单.层级/=,资源管理菜单.菜单状态/=,资源管理菜单.上级目录/=,资源管理菜单.删除标志/=,资源管理菜单.系统类型/=
+     * 功能描述=总部资源列表查询
+     *
+     * @param lineList
+     * @param config
+     * @param currentIndexMap
+     */
+    public void parseIndexedConfigV2(List<String> lineList, MenuConfig config, Map<String, Integer> currentIndexMap) {
+
+        List<String> result = lineList.stream().filter(item -> StringUtils.isNotBlank(item)).collect(Collectors.toList());
 
 
+        System.out.println("返回值{}" + JSON.toJSONString(result));
+        String typeLine = result.get(0);
+
+
+        //类型：新增，查询，更新
+        String configType = typeLine.split("=")[1];
+        Integer index = currentIndexMap.get(configType);
+        if (index == null) {
+            index = 0;
+            currentIndexMap.put(configType, index);
+        } else {
+            index++;
+            currentIndexMap.put(configType, index);
+        }
+
+        // 更新当前索引
+        for (int i = 1; i < result.size(); i++) {
+            if (StringUtil.isBlank(result.get(i))) {
+                continue;
+            }
+            String line = result.get(i).trim();
+            String configField = result.get(i).trim();
+// 根据配置类型处理
+            switch (configType) {
+                case "新增":
+                    handleInsertConfig(config, index, configField, line);
+                    break;
+                case "更新":
+                    handleUpdateConfig(config, index, configField, line);
+                    break;
+                case "删除":
+                    handleDeleteConfig(config, index, configField, line);
+                    break;
+                case "查询":
+                    handleQueryConfig(config, index, configField, line);
+                    break;
+                case "新建表":
+                    handleCreateTableConfig(config, index, configField, line);
+                    break;
+                case "新增字段":
+                    handleInsertTableColumnConfig(config, index, configField, line);
+                    break;
+            }
+        }
+
+    }
+
+
+    /**
+     * 模版1的样式：
+     * 需要解析当前模版中的出现的下标数字来进行处理
+     * 查询[2].查询目标字段=资源管理菜单.主键id,资源管理菜单.名称,资源管理菜单.菜单代码,资源管理菜单.菜单图标,资源管理菜单.页面路由,资源管理菜单.类型,资源管理菜单.权限级别,资源管理菜单.层级,资源管理菜单.排序,资源管理菜单.上级目录,资源管理菜单.层级关系,资源管理菜单.按钮数量,资源管理菜单.渠道标识,资源管理菜单.创建人ID,资源管理菜单.创建时间,资源管理菜单.更新人ID,资源管理菜单.更新时间,资源管理菜单.删除标志,资源管理菜单.系统类型,资源管理菜单.菜单状态
+     * 查询[2].数据库表=t_cms_menu
+     * 查询[2].是否需要分页=否
+     * 查询[2].查询参数字段=资源管理菜单.类型/=,资源管理菜单.层级/=,资源管理菜单.类型/excludeType/!=,资源管理菜单.删除标志/=
+     * 查询[2].功能描述=总部资源获取下拉的菜单列表
+     *
+     * @param line
+     * @param config
+     * @param currentIndexMap
+     */
     public void parseIndexedConfig(String line, MenuConfig config, Map<String, Integer> currentIndexMap) {
         // 解析配置类型和索引
         String[] parts = line.split("\\.");
@@ -203,7 +286,7 @@ public class ConfigFileReader {
             case "唯一性校验":
                 insertConfig.addOnlyOneCheck(value);
                 break;
-            case "功能描述":
+            case "【功能描述】":
                 insertConfig.setName(value);
                 break;
             case "新增转换规则":
@@ -237,7 +320,7 @@ public class ConfigFileReader {
             case "更新转换规则":
                 updateConfig.addRuleDB(value);
                 break;
-            case "功能描述":
+            case "【功能描述】":
                 updateConfig.setName(value);
                 break;
             case "更新数据库表":
@@ -265,7 +348,7 @@ public class ConfigFileReader {
             case "更新转换规则":
                 deleteConfig.addRuleDB(value);
                 break;
-            case "功能描述":
+            case "【功能描述】":
                 deleteConfig.setName(value);
                 break;
             case "更新数据库表":
@@ -296,7 +379,7 @@ public class ConfigFileReader {
             case "查询参数字段":
                 queryConfig.setConditions(value);
                 break;
-            case "功能描述":
+            case "【功能描述】":
                 queryConfig.setName(value);
                 break;
             case "多表连接查询数据表":

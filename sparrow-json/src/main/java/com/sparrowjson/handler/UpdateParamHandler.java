@@ -15,6 +15,7 @@ import com.sparrowjson.vo.UpdateConfig;
 import com.google.common.collect.Lists;
 import com.sparrowjson.vo.unit.FrontendItemConfigBO;
 import lombok.Data;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 
 import java.util.HashMap;
@@ -56,15 +57,12 @@ public class UpdateParamHandler implements VariableHandler {
         if (StringUtil.isBlank(insertFieldStr)) {
             return backendVariablesVO;
         }
-
-//        Map<String, String> columnCommentMap = menuConfig.getColumnCommentMap();
-//        if (tableName != null && !Objects.equals(tableName, menuConfig.getTable())) {
-//            List<ColumnVO> coulumns = DatabaseMetaDataUtil.getCoulumns(tableName);
-//            columnCommentMap = coulumns.stream().collect(Collectors.toMap(ColumnVO::getComment, ColumnVO::getColumnName, (v1, v2) -> v1));
-//        }
-
-        //前端配置模版
-        Map<String, FrontendItemConfigBO> frontendItemConfigBOMap = menuConfig.getFrontendItemConfigBOMap();
+        //当前未配置相关表时直接走默认的配置表
+        Map<String, String> columnCommentMap = menuConfig.getColumnCommentMap();
+        if (tableName != null && !Objects.equals(tableName, menuConfig.getTable())) {
+            List<ColumnVO> coulumns = DatabaseMetaDataUtil.getCoulumns(tableName);
+            columnCommentMap = coulumns.stream().collect(Collectors.toMap(ColumnVO::getComment, ColumnVO::getColumnName, (v1, v2) -> v1));
+        }
 
         String[] insertFields = insertFieldStr.split(SparrowBackendConstant.COMMA_SEPARATOR);
 
@@ -72,15 +70,13 @@ public class UpdateParamHandler implements VariableHandler {
         for (String tableField : insertFields) {
             TableInsertDTO tableInsertDTO = new TableInsertDTO();
 
-//            String realTableField = columnCommentMap.get(tableField);
-//            if (StringUtil.isBlank(realTableField)) {
-//                throw new IllegalArgumentException("字段:" + tableField + "没有对应的数据库字段");
-//            }
-            FrontendItemConfigBO frontendItemConfigBO = frontendItemConfigBOMap.get(tableField);
-            String realTableField = frontendItemConfigBO.getValue();
+            String realTableField = columnCommentMap.get(tableField);
+            if (StringUtil.isBlank(realTableField)) {
+                throw new IllegalArgumentException("字段:" + tableField + "没有对应的数据库字段");
+            }
+
             tableInsertDTO.setTableField(realTableField);
             tableInsertDTO.setUpdateField(SnakeToCamelUtil.toCamelCase(realTableField));
-            tableInsertDTO.setUpdateField(frontendItemConfigBO.getTargetField());
             tableInsertDTOS.add(tableInsertDTO);
         }
         config = config.replace("${updateParam}", JSON.toJSONString(tableInsertDTOS));
@@ -88,6 +84,52 @@ public class UpdateParamHandler implements VariableHandler {
 
         return backendVariablesVO;
     }
+
+
+//    @Override
+//    public BackendVariablesVO convertVariables(SparrowBackendConfigDTO sparrowBackendConfigDTO, MenuConfig menuConfig, BackConfig backConfig) {
+//        BackendVariablesVO backendVariablesVO = createBackendVariablesVO(sparrowBackendConfigDTO);
+//
+//        String config = sparrowBackendConfigDTO.getConfig();
+//        String insertFieldStr = null;
+//        String tableName = null;
+//        if (backConfig instanceof UpdateConfig) {
+//            UpdateConfig updateConfig = (UpdateConfig) backConfig;
+//            insertFieldStr = updateConfig.getUpdateFields();
+//            tableName = updateConfig.getTableName();
+//        }
+//        if (backConfig instanceof DeleteConfig) {
+//            DeleteConfig deleteConfig = (DeleteConfig) backConfig;
+//            insertFieldStr = deleteConfig.getUpdateFields();
+//            tableName = deleteConfig.getTableName();
+//        }
+//        if (StringUtil.isBlank(insertFieldStr)) {
+//            return backendVariablesVO;
+//        }
+//
+//        //前端配置模版
+//        Map<String, FrontendItemConfigBO> frontendItemConfigBOMap = menuConfig.getFrontendItemConfigBOMap();
+//
+//        String[] insertFields = insertFieldStr.split(SparrowBackendConstant.COMMA_SEPARATOR);
+//
+//        List<TableInsertDTO> tableInsertDTOS = Lists.newArrayList();
+//        for (String tableField : insertFields) {
+//            TableInsertDTO tableInsertDTO = new TableInsertDTO();
+//
+//            FrontendItemConfigBO frontendItemConfigBO = frontendItemConfigBOMap.get(tableField);
+//            String realTableField = frontendItemConfigBO.getValue();
+//            if (StringUtil.isBlank(realTableField)) {
+//                throw new IllegalArgumentException("字段:" + tableField + "没有对应的数据库字段");
+//            }
+//            tableInsertDTO.setTableField(realTableField);
+//            tableInsertDTO.setUpdateField(frontendItemConfigBO.getTargetField());
+//            tableInsertDTOS.add(tableInsertDTO);
+//        }
+//        config = config.replace("${updateParam}", JSON.toJSONString(tableInsertDTOS));
+//        backendVariablesVO.setValue(config);
+//
+//        return backendVariablesVO;
+//    }
 
     @Data
     public static class TableInsertDTO {

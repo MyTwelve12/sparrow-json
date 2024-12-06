@@ -31,6 +31,7 @@ import java.util.stream.Collectors;
  ********************************************************************/
 @Component("insertTargetRule")
 public class InsertTargetRuleHandler implements VariableHandler {
+
     @Override
     public BackendVariablesVO convertVariables(SparrowBackendConfigDTO sparrowBackendConfigDTO, MenuConfig menuConfig, BackConfig backConfig) {
         BackendVariablesVO backendVariablesVO = createBackendVariablesVO(sparrowBackendConfigDTO);
@@ -43,25 +44,21 @@ public class InsertTargetRuleHandler implements VariableHandler {
         InsertConfig insertConfig = (InsertConfig) backConfig;
 
         String tableName = insertConfig.getTableName();
-//        Map<String, String> columnCommentMap = menuConfig.getColumnCommentMap();
-//        if (tableName != null && !Objects.equals(tableName, menuConfig.getTable())) {
-//            targetTableRuleDTO.setTableName(tableName);
-//            List<ColumnVO> coulumns = DatabaseMetaDataUtil.getCoulumns(tableName);
-//            columnCommentMap = coulumns.stream().collect(Collectors.toMap(ColumnVO::getComment, ColumnVO::getColumnName, (v1, v2) -> v1));
-//        }
 
-        //前端配置map
-        Map<String, FrontendItemConfigBO> frontendItemConfigBOMap = menuConfig.getFrontendItemConfigBOMap();
-
+        //当前未配置相关表时直接走默认的配置表
+        Map<String, String> columnCommentMap = menuConfig.getColumnCommentMap();
+        if (tableName != null && !Objects.equals(tableName, menuConfig.getTable())) {
+            targetTableRuleDTO.setTableName(tableName);
+            List<ColumnVO> coulumns = DatabaseMetaDataUtil.getCoulumns(tableName);
+            columnCommentMap = coulumns.stream().collect(Collectors.toMap(ColumnVO::getComment, ColumnVO::getColumnName, (v1, v2) -> v1));
+        }
 
         if (!StringUtils.isBlank(insertConfig.getBatchInsertFields())) {
             targetTableRuleDTO.setBatchInsertType(2);
             String[] batchInsertFields = insertConfig.getBatchInsertFields().split(SparrowBackendConstant.COMMA_SEPARATOR);
 
             for (int i = 0; i < batchInsertFields.length; i++) {
-//                String realTableField = columnCommentMap.get(batchInsertFields[i]);
-                String realTableField = frontendItemConfigBOMap.get(batchInsertFields[i]).getValue();
-
+                String realTableField = columnCommentMap.get(batchInsertFields[i]);
                 batchInsertFields[i] = realTableField;
             }
 
@@ -71,6 +68,42 @@ public class InsertTargetRuleHandler implements VariableHandler {
         backendVariablesVO.setValue(config);
         return backendVariablesVO;
     }
+
+
+
+//    @Override
+//    public BackendVariablesVO convertVariables(SparrowBackendConfigDTO sparrowBackendConfigDTO, MenuConfig menuConfig, BackConfig backConfig) {
+//        BackendVariablesVO backendVariablesVO = createBackendVariablesVO(sparrowBackendConfigDTO);
+//
+//        String config = sparrowBackendConfigDTO.getConfig();
+//
+//        InsertTargetTableRuleDTO targetTableRuleDTO = new InsertTargetTableRuleDTO();
+//        targetTableRuleDTO.setDatasourceName(menuConfig.getDatabase());
+//        targetTableRuleDTO.setTableName(menuConfig.getTable());
+//        InsertConfig insertConfig = (InsertConfig) backConfig;
+//
+//        String tableName = insertConfig.getTableName();
+//        //前端配置map
+//        Map<String, FrontendItemConfigBO> frontendItemConfigBOMap = menuConfig.getFrontendItemConfigBOMap();
+//
+//
+//        if (!StringUtils.isBlank(insertConfig.getBatchInsertFields())) {
+//            targetTableRuleDTO.setBatchInsertType(2);
+//            String[] batchInsertFields = insertConfig.getBatchInsertFields().split(SparrowBackendConstant.COMMA_SEPARATOR);
+//
+//            for (int i = 0; i < batchInsertFields.length; i++) {
+////                String realTableField = columnCommentMap.get(batchInsertFields[i]);
+//                String realTableField = frontendItemConfigBOMap.get(batchInsertFields[i]).getValue();
+//
+//                batchInsertFields[i] = realTableField;
+//            }
+//
+//            targetTableRuleDTO.setBatchInsertDTOParam(Arrays.asList(batchInsertFields));
+//        }
+//        config = config.replace("${tableRule}", JSON.toJSONString(targetTableRuleDTO));
+//        backendVariablesVO.setValue(config);
+//        return backendVariablesVO;
+//    }
 
     @Data
     public static class InsertTargetTableRuleDTO {

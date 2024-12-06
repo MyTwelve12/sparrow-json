@@ -30,6 +30,11 @@ public class MenuConfig {
     private List<QueryConfig> queryConfigs = new ArrayList<>();
 
     /**
+     * 前后端定义的功能别名
+     */
+    private Map<String, String> functionAliasMap = new HashMap<>();
+
+    /**
      * 数据库字段映射
      */
     private Map<String, FrontendItemConfigBO> frontendItemConfigBOMap = new HashMap<>();

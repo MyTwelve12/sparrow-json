@@ -16,7 +16,15 @@ import java.util.List;
 @Data
 public class BackendVO {
 
+    /**
+     * 模版别名
+     */
     private String templateAlias;
+
+    /**
+     * 功能别名
+     */
+    private String functionAlias;
 
     private BackendEndpointVO endpoint;
 
