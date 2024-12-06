@@ -23,5 +23,5 @@ public class InsertConfig extends BackConfig {
 
     private String batchInsertFields;
 
-    private String tableName;
+
 }

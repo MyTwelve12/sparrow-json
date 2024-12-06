@@ -20,5 +20,4 @@ public class DeleteConfig extends BackConfig {
     private String templateAlias = "delete";
     private String name;
 
-    private String tableName;
 }
