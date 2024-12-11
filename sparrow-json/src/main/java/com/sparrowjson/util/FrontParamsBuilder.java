@@ -333,25 +333,7 @@ public class FrontParamsBuilder {
                             getDefaultMapValue(propValue, propValue, true);
 //                            String finalChildValue = StringUtils.isEmpty(hashMap.get(propValue)) ? propValue : hashMap.get(propValue);
                             Object finalChildValue = getDefaultMapValue(propValue, propValue, true);
-
-                            //增加数组中某一个元素套数组的场景
-                            if (propKey.contains("(")) {
-                                int startIndex = propKey.indexOf("(");
-                                int endIndex = propKey.indexOf(")");
-                                String childType = propKey.substring(startIndex + 1, endIndex).trim().toLowerCase();
-                                String realChildKey = propKey.substring(0, startIndex).trim();
-//                    String mappedRealChildKey = hashMap.getOrDefault(realChildKey, realChildKey);
-                                Object mappedRealChildKey = getDefaultMapValue(realChildKey, realChildKey, false);
-
-                                if ("array".equals(childType)) {
-                                    obj.put((String) mappedRealChildKey, parseArray(nextLevel));
-                                } else if ("object".equals(childType)) {
-                                    obj.put((String) mappedRealChildKey, parseObject(nextLevel));
-                                }
-                            } else {
-                                obj.put(propKey, finalChildValue);
-                            }
-
+                            obj.put(propKey, finalChildValue);
                         }
                     }
                 }
