@@ -49,6 +49,9 @@ public class QueryTargetRuleHandler implements VariableHandler {
         TableRuleDTO tableRuleDTO = new TableRuleDTO();
         tableRuleDTO.setTableDataSource(menuConfig.getDatabase());
         tableRuleDTO.setTableName(menuConfig.getTable());
+        if (queryConfig.isReturnObject()) {
+            tableRuleDTO.setTableDataReturnType(2);
+        }
         //多表关联查询
         if (!StringUtil.isBlank(queryConfig.getMultiTables())) {
             multitablerQuery(config, tableRuleDTO, queryConfig, backendVariablesVO);
@@ -140,6 +143,9 @@ public class QueryTargetRuleHandler implements VariableHandler {
             outputType = 3;
             tableRuleDTO.setTableTotalCount(2);
         }
+        if (queryConfig.isReturnObject()) {
+            tableRuleDTO.setTableDataReturnType(2);
+        }
         if (StringUtil.isNotEmpty(queryConfig.getSortField())) {
 
             String[] sortFields = queryConfig.getSortField().split(SparrowBackendConstant.SLASH_SEPARATOR);
@@ -186,5 +192,6 @@ public class QueryTargetRuleHandler implements VariableHandler {
         private String tablePage;
         private String tableSort;
         private Integer tableTotalCount;
+        private Integer tableDataReturnType;
     }
 }

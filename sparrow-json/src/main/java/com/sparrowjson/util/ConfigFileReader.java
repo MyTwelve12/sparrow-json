@@ -305,6 +305,9 @@ public class ConfigFileReader {
             case "rpc方法调用":
                 queryConfig.addRpcList(value);
                 break;
+            case "查询单个返回":
+                queryConfig.setReturnObject(true);
+                break;
         }
     }
 

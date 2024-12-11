@@ -26,4 +26,6 @@ public class QueryConfig extends BackConfig {
     private String name;
 
     private String multiTables;
+
+    private boolean returnObject;
 }
