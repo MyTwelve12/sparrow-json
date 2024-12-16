@@ -43,7 +43,7 @@ public class OnlyOneCheckHandler implements VariableHandler {
             return null;
         }
         Map<String, String> columnCommentMap = menuConfig.getColumnCommentMap();
-        String tableName = backConfig.getTableName();
+        String tableName = backConfig.getTableName() != null ? backConfig.getTableName() : menuConfig.getTable();
         if (tableName != null && !Objects.equals(tableName, menuConfig.getTable())) {
             List<ColumnVO> coulumns = DatabaseMetaDataUtil.getCoulumns(tableName);
             columnCommentMap = coulumns.stream().collect(Collectors.toMap(ColumnVO::getComment, ColumnVO::getColumnName, (v1, v2) -> v1));
@@ -71,7 +71,7 @@ public class OnlyOneCheckHandler implements VariableHandler {
 
             OnlyOneCheckDTO onlyOneCheckDTO = new OnlyOneCheckDTO();
             onlyOneCheckDTO.setDatasourceName(menuConfig.getDatabase());
-            onlyOneCheckDTO.setTableName(menuConfig.getTable());
+            onlyOneCheckDTO.setTableName(tableName);
             onlyOneCheckDTO.setErrorCode(errorCode);
             onlyOneCheckDTO.setErrorMsg(errorMsg);
 
